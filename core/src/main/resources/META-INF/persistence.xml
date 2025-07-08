@@ -1,0 +1,15 @@
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
+    <persistence-unit name="BankAutoPU" transaction-type="JTA">
+        <jta-data-source>jdbc/BankAutoPool</jta-data-source>
+        <class>lk.jiat.bankauto.core.model.Test</class>
+        <!--         <class>lk.jiat.app.core.model.Product</class> -->
+        <shared-cache-mode>NONE</shared-cache-mode>
+        <properties>
+<!--            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>-->
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+            <property name="eclipselink.ddl-generation.output-mode" value="database"/>
+            <property name="jakarta.persistence.sharedCache.mode" value="NONE"/>
+            <property name="eclipselink.cache.shared.default" value="false"/>
+        </properties>
+    </persistence-unit>
+</persistence>

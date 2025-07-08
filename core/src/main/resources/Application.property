@@ -1,0 +1,5 @@
+mailtrap.host=sandbox.smtp.mailtrap.io
+mailtrap.port=2525
+mailtrap.username=0beb402d0765e2
+mailtrap.password=0690e39f6d5e43
+app.email=info@j2eeapp.com

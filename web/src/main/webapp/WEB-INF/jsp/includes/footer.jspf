@@ -1,0 +1,37 @@
+<%-- Common footer fragment for all JSP pages --%>
+<%-- Initialize common scripts and cleanup --%>
+<script>
+    // Initialize common functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Initialize popovers
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl);
+        });
+        
+        // Session timeout warning (25 minutes = 1500000 ms)
+        setTimeout(function() {
+            if (typeof showSessionWarning === 'function') {
+                showSessionWarning();
+            }
+        }, 1500000);
+    });
+</script>
+
+<%-- Debug information (only in development mode) --%>
+<%
+    String developmentMode = application.getInitParameter("development.mode");
+    if ("true".equals(developmentMode)) {
+%>
+<!-- Debug Info: Generated at <%= currentTime %> -->
+<!-- Context Path: <%= contextPath %> -->
+<!-- Session ID: <%= session.getId() %> -->
+<%
+    }
+%>

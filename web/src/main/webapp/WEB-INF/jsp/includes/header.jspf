@@ -1,0 +1,29 @@
+<%-- Common header fragment for all JSP pages --%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%
+    // Set character encoding
+    request.setCharacterEncoding("UTF-8");
+    response.setCharacterEncoding("UTF-8");
+    
+    // Security headers
+    response.setHeader("X-Content-Type-Options", "nosniff");
+    response.setHeader("X-Frame-Options", "DENY");
+    response.setHeader("X-XSS-Protection", "1; mode=block");
+    response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    
+    // Cache control for dynamic content
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+    
+    // Application context
+    String contextPath = request.getContextPath();
+    String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+%>
+<%-- Store context path for JavaScript use --%>
+<script>
+    window.contextPath = '<%= contextPath %>';
+    window.currentTime = '<%= currentTime %>';
+</script>
