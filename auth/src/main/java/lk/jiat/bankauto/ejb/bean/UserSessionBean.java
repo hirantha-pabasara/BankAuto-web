@@ -2,6 +2,7 @@ package lk.jiat.bankauto.ejb.bean;
 
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import lk.jiat.bankauto.core.model.User;
 import lk.jiat.bankauto.core.service.UserService;
@@ -73,5 +74,15 @@ public class UserSessionBean implements UserService {
         return false;
     }
 
+    @Override
+    public User findUserByUsernameOrEmail(String login) {
+        try{
+            return entityManager.createNamedQuery("User.findByUsernameOrEmail", User.class)
+                    .setParameter("login", login)
+                    .getSingleResult();
+        }catch (NoResultException e){
+            return null;
+        }
+    }
 
 }

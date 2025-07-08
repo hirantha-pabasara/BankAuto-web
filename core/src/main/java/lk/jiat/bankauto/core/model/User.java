@@ -8,6 +8,7 @@ import java.io.Serializable;
 @NamedQueries({
         @NamedQuery(name = "User.findByEmail", query = "select u from User u where u.email=:email"),
         @NamedQuery(name = "User.findAll", query = "select u from User u"),
+        @NamedQuery(name = "User.findByUsernameOrEmail", query = "select u from User u where u.userName=:login OR u.email=:login"),
 })
 public class User implements Serializable {
 
