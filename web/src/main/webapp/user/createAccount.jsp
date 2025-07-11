@@ -10,9 +10,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body id="page-top">
-    <div id="wrapper">
+    <div id="wrapper" class="d-flex">
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion">
+        <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion" id="accordionSidebar">
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard.jsp">
                 <div class="sidebar-brand-icon">
                     <i class="fas fa-university"></i>
@@ -74,7 +74,13 @@
             <div id="content">
                 <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <!-- Sidebar Toggle (Topbar) -->
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    
+                    <!-- Sidebar Toggle (Desktop) -->
+                    <button id="sidebarToggle" class="btn btn-link d-none d-md-inline-block mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
                     
@@ -114,7 +120,7 @@
                     
                     <!-- Account Type Selection -->
                     <div class="row mb-4">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <div class="card account-type-card" onclick="selectAccountType('savings')">
                                 <div class="card-body text-center">
                                     <i class="fas fa-piggy-bank fa-3x text-success mb-3"></i>
@@ -129,8 +135,7 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <div class="card account-type-card" onclick="selectAccountType('checking')">
                                 <div class="card-body text-center">
                                     <i class="fas fa-credit-card fa-3x text-primary mb-3"></i>
@@ -145,19 +150,51 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="col-md-4 mb-3">
-                            <div class="card account-type-card" onclick="selectAccountType('business')">
+                        <div class="col-md-3 mb-3">
+                            <div class="card account-type-card" onclick="selectAccountType('current')">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-briefcase fa-3x text-info mb-3"></i>
-                                    <h5 class="card-title">Business Account</h5>
-                                    <p class="card-text">Designed for business owners and entrepreneurs</p>
+                                    <i class="fas fa-wallet fa-3x text-warning mb-3"></i>
+                                    <h5 class="card-title">Current Account</h5>
+                                    <p class="card-text">Ideal for frequent transactions and business needs</p>
                                     <ul class="text-left">
-                                        <li>Business Banking Features</li>
-                                        <li>Merchant Services</li>
-                                        <li>$500 Minimum Opening</li>
-                                        <li>Business Support</li>
+                                        <li>Overdraft Facility</li>
+                                        <li>Cheque Book</li>
+                                        <li>Minimum $200 Opening</li>
+                                        <li>Online Banking</li>
                                     </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card account-type-card" onclick="selectAccountType('fixed')">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-lock fa-3x text-danger mb-3"></i>
+                                    <h5 class="card-title">Fixed Deposit</h5>
+                                    <p class="card-text">Grow your savings with higher interest rates</p>
+                                    <ul class="text-left">
+                                        <li>Up to 6% Annual Interest</li>
+                                        <li>Flexible Tenure</li>
+                                        <li>Minimum $1000 Opening</li>
+                                        <li>Safe & Secure</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar and Pending Review Message (hidden by default) -->
+                    <div id="pendingReviewSection" style="display:none;">
+                        <div class="alert alert-warning d-flex align-items-center" role="alert">
+                            <i class="fas fa-hourglass-half fa-lg me-2"></i>
+                            <div>
+                                Please wait while our team reviews your account request. You will be notified once it is approved.
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold mb-1">Account Creation Progress</label>
+                            <div class="progress" style="height: 1.5rem;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                    Step 2 of 2: Awaiting Review
                                 </div>
                             </div>
                         </div>
@@ -169,7 +206,7 @@
                             <h6 class="m-0 font-weight-bold text-primary">Account Details</h6>
                         </div>
                         <div class="card-body">
-                            <form method="post" action="">
+                            <form method="post" action="account-creation" enctype="multipart/form-data" id="createAccountForm">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
@@ -185,7 +222,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
@@ -202,17 +238,21 @@
                                                 <option value="EUR">EUR - Euro</option>
                                                 <option value="GBP">GBP - British Pound</option>
                                                 <option value="CAD">CAD - Canadian Dollar</option>
+                                                <option value="LKR">LKR - Sri Lankan Rupee</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div class="form-group mb-3">
                                     <label for="purpose">Purpose of Account:</label>
                                     <textarea class="form-control" id="purpose" name="purpose" rows="3" 
                                               placeholder="Please describe the intended use of this account"></textarea>
                                 </div>
-                                
+                                <div class="form-group mb-3">
+                                    <label for="documentUpload">Upload Supporting Document(s):</label>
+                                    <input type="file" class="form-control" id="documentUpload" name="documentUpload" multiple required>
+                                    <small class="form-text text-muted">Accepted formats: PDF, JPG, PNG. Max size: 5MB each.</small>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
@@ -235,16 +275,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div class="form-group mb-3">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="agreeTerms" required>
+                                        <input type="checkbox" class="custom-control-input" id="agreeTerms" name="agreeTerms" required>
                                         <label class="custom-control-label" for="agreeTerms">
                                             I agree to the <a href="#" class="text-primary">Account Terms and Conditions</a>
                                         </label>
                                     </div>
                                 </div>
-                                
                                 <div class="row">
                                     <div class="col-md-6">
                                         <button type="button" class="btn btn-secondary w-100" onclick="resetForm()">
@@ -262,13 +300,48 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>&copy; 2025 BankAuto. All rights reserved.</span>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
+    <script src="../js/account-creation.js"></script>
     <script>
         let selectedAccountType = '';
+        
+        // Initialize sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarToggleTop = document.getElementById('sidebarToggleTop');
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-toggled');
+                    const sidebar = document.querySelector('.sidebar');
+                    if (sidebar) {
+                        sidebar.classList.toggle('toggled');
+                    }
+                });
+            }
+            
+            if (sidebarToggleTop) {
+                sidebarToggleTop.addEventListener('click', function() {
+                    const sidebar = document.querySelector('.sidebar');
+                    if (sidebar) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+            }
+        });
         
         function selectAccountType(type) {
             selectedAccountType = type;
@@ -288,7 +361,8 @@
             const typeNames = {
                 'savings': 'Savings Account',
                 'checking': 'Checking Account',
-                'business': 'Business Account'
+                'current': 'Current Account',
+                'fixed': 'Fixed Deposit'
             };
             
             document.getElementById('accountType').value = typeNames[type];
@@ -297,7 +371,8 @@
             const minDeposits = {
                 'savings': 100,
                 'checking': 0,
-                'business': 500
+                'current': 200,
+                'fixed': 1000
             };
             
             document.getElementById('initialDeposit').min = minDeposits[type];
@@ -314,9 +389,33 @@
             });
             selectedAccountType = '';
         }
+        
+        // Show pending review section after form submission
+        document.getElementById('createAccountForm').addEventListener('submit', handleAccountCreation);
     </script>
     
     <style>
+        /* Additional layout fixes */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        #wrapper {
+            min-height: 100vh;
+        }
+        
+        .topbar {
+            border-bottom: 1px solid #e3e6f0;
+        }
+        
+        .sticky-footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #e3e6f0;
+        }
+        
+        /* Account type card styling */
         .account-type-card {
             cursor: pointer;
             transition: all 0.3s ease;
@@ -347,6 +446,20 @@
             content: "✓ ";
             color: #28a745;
             font-weight: bold;
+        }
+        
+        /* Mobile sidebar overlay */
+        @media (max-width: 576px) {
+            .sidebar.show::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: -1;
+            }
         }
     </style>
 </body>

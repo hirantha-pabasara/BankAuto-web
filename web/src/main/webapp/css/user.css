@@ -1,5 +1,72 @@
 /* User-specific CSS for BankAuto */
 
+/* Layout Structure */
+#wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 14rem;
+    min-height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+#content-wrapper {
+    margin-left: 14rem;
+    min-height: 100vh;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s;
+}
+
+#content {
+    flex: 1 0 auto;
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    height: 4.375rem;
+}
+
+.sticky-footer {
+    flex-shrink: 0;
+    padding: 1rem 0;
+    margin-top: auto;
+}
+
+/* Sidebar toggled state */
+.sidebar.toggled {
+    width: 6.5rem;
+}
+
+.sidebar.toggled #content-wrapper {
+    margin-left: 6.5rem;
+}
+
+body.sidebar-toggled .sidebar {
+    width: 6.5rem;
+}
+
+body.sidebar-toggled #content-wrapper {
+    margin-left: 6.5rem;
+}
+
+body.sidebar-toggled .sidebar .nav-item .nav-link span {
+    display: none;
+}
+
+body.sidebar-toggled .sidebar-brand-text {
+    display: none;
+}
+
 /* User Color Scheme */
 .bg-gradient-success {
     background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
@@ -408,12 +475,25 @@
         width: 6.5rem;
     }
     
+    #content-wrapper {
+        margin-left: 6.5rem;
+    }
+    
     .sidebar .nav-item .nav-link span {
         display: none;
     }
     
     .sidebar-brand-text {
         display: none;
+    }
+    
+    .sidebar .nav-item .nav-link {
+        text-align: center;
+        padding: 0.75rem 1rem;
+    }
+    
+    .sidebar .nav-item .nav-link i {
+        margin-right: 0;
     }
     
     .balance-display {
@@ -440,7 +520,13 @@
 
 @media (max-width: 576px) {
     .sidebar {
-        display: none;
+        transform: translateX(-100%);
+        position: fixed;
+        z-index: 1040;
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
     }
     
     #content-wrapper {

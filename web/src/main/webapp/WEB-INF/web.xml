@@ -10,7 +10,7 @@
     <description>
         BankAuto Banking System - A comprehensive web-based banking application
         with admin and user interfaces for account management and transactions.
-        
+
         NOTE: This is the UI-only version. Backend-related configurations are commented out
         until backend implementation is complete.
     </description>
@@ -86,7 +86,7 @@
 
     <!-- ========== EJB BACKEND CONFIGURATIONS COMMENTED OUT FOR UI DEVELOPMENT ========== -->
     <!-- Uncomment these sections when EJB modules (account-ejb, auth-ejb, core) are ready -->
-    
+
     <!-- EJB References - COMMENTED OUT FOR UI DEVELOPMENT -->
     <!--
     <ejb-local-ref>
@@ -94,32 +94,32 @@
         <ejb-ref-type>Session</ejb-ref-type>
         <local>com.bankauto.auth.AuthenticationService</local>
     </ejb-local-ref>
-    
+
     <ejb-local-ref>
         <ejb-ref-name>ejb/UserManagementService</ejb-ref-name>
         <ejb-ref-type>Session</ejb-ref-type>
         <local>com.bankauto.auth.UserManagementService</local>
     </ejb-local-ref>
-    
+
     <ejb-local-ref>
         <ejb-ref-name>ejb/AccountService</ejb-ref-name>
         <ejb-ref-type>Session</ejb-ref-type>
         <local>com.bankauto.account.AccountService</local>
     </ejb-local-ref>
-    
+
     <ejb-local-ref>
         <ejb-ref-name>ejb/TransactionService</ejb-ref-name>
         <ejb-ref-type>Session</ejb-ref-type>
         <local>com.bankauto.account.TransactionService</local>
     </ejb-local-ref>
-    
+
     <ejb-local-ref>
         <ejb-ref-name>ejb/AdminService</ejb-ref-name>
         <ejb-ref-type>Session</ejb-ref-type>
         <local>com.bankauto.account.AdminService</local>
     </ejb-local-ref>
     -->
-    
+
     <!-- Security Constraints - COMMENTED OUT FOR UI DEVELOPMENT -->
     <!--
     <security-constraint>
