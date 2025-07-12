@@ -1,12 +1,13 @@
 package lk.jiat.bankauto.core.service;
 
 import jakarta.ejb.Local;
+import jakarta.ejb.Remote;
 import lk.jiat.bankauto.core.dto.AccountCreationRequest;
 import lk.jiat.bankauto.core.model.BankAccount;
 
 import java.util.List;
 
-@Local
+@Remote
 public interface AccountService {
     BankAccount createAccount(AccountCreationRequest request);
     List<BankAccount> getUserAccounts(Long userId);

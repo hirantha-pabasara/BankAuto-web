@@ -344,41 +344,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
-    <script>
-        function viewDetails(accountType) {
-            alert('Viewing details for ' + accountType + ' account');
-            // TODO: Implement account details view
-        }
-        
-        function transfer(accountType) {
-            alert('Transfer from ' + accountType + ' account');
-            // TODO: Implement transfer functionality
-        }
-        
-        function statement(accountType) {
-            alert('Generating statement for ' + accountType + ' account');
-            // TODO: Implement statement generation
-        }
-        
-        function orderChecks() {
-            alert('Check ordering feature coming soon!');
-            // TODO: Implement check ordering
-        }
-        
-        function requestCard() {
-            alert('Card request submitted successfully!');
-            // TODO: Implement card request
-        }
-        
-        function directDeposit() {
-            alert('Direct deposit setup coming soon!');
-            // TODO: Implement direct deposit setup
-        }
-        
-        function autoTransfer() {
-            alert('Auto transfer setup coming soon!');
-            // TODO: Implement auto transfer setup
-        }
-    </script>
+    <script src="../js/loadAccountData.js"></script>
 </body>
 </html>

@@ -1,8 +1,9 @@
 package lk.jiat.bankauto.core.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class AccountCreationRequest {
+public class AccountCreationRequest implements Serializable {
     private Long userId;
     private String accountType;
     private String accountName;

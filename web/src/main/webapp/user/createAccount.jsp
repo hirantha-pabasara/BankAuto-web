@@ -87,7 +87,17 @@
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">John Doe</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <%
+                                        // Get user full name from session
+                                        String userFullName = (String) session.getAttribute("userFullName");
+                                        if (userFullName != null && !userFullName.trim().isEmpty()) {
+                                            out.print(userFullName);
+                                        } else {
+                                            out.print("Guest User");
+                                        }
+                                    %>
+                                </span>
                                 <i class="fas fa-user-circle fa-fw"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">

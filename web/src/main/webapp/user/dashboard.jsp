@@ -73,29 +73,172 @@
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow-lg">
+                    <!-- Sidebar Toggle -->
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
                     
+                    <!-- Desktop Sidebar Toggle -->
+                    <button id="sidebarToggle" class="btn btn-link d-none d-md-inline-block mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    
+                    <!-- Search Bar -->
+                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search transactions, accounts..." aria-label="Search">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Navbar Right Items -->
                     <ul class="navbar-nav ml-auto">
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">John Doe</span>
-                                <i class="fas fa-user-circle fa-fw"></i>
+                        <!-- Notifications Dropdown -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell fa-fw"></i>
+                                <span class="badge badge-danger badge-counter">3</span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                            <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="alertsDropdown" style="max-width: 350px;">
+                                <h6 class="dropdown-header bg-primary text-white">
+                                    <i class="fas fa-bell mr-2"></i>Alerts Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-file-alt text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">Today</div>
+                                        <span class="font-weight-bold">Monthly report is ready!</span>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-success">
+                                            <i class="fas fa-donate text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">Yesterday</div>
+                                        $290.29 deposited to your account!
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-exclamation-triangle text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">2 days ago</div>
+                                        Spending alert: High activity detected
+                                    </div>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">
+                                    <i class="fas fa-eye mr-1"></i>View All Alerts
+                                </a>
+                            </div>
+                        </li>
+                        
+                        <!-- Messages Dropdown -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-envelope fa-fw"></i>
+                                <span class="badge badge-primary badge-counter">2</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="messagesDropdown" style="max-width: 350px;">
+                                <h6 class="dropdown-header bg-info text-white">
+                                    <i class="fas fa-envelope mr-2"></i>Message Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <div class="status-indicator bg-success"></div>
+                                        <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        <div class="text-truncate">Account verification completed</div>
+                                        <div class="small text-gray-500">Support Team · 2h</div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <div class="status-indicator bg-warning"></div>
+                                        <div class="avatar-sm bg-success rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-info text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        <div class="text-truncate">New security feature available</div>
+                                        <div class="small text-gray-500">Security Team · 1d</div>
+                                    </div>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">
+                                    <i class="fas fa-envelope-open mr-1"></i>Read All Messages
+                                </a>
+                            </div>
+                        </li>
+                        
+                        <!-- Divider -->
+                        <div class="topbar-divider d-none d-sm-block"></div>
+                        
+                        <!-- User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="d-flex align-items-center">
+                                    <div class="mr-2 d-none d-lg-block text-right">
+                                        <span class="text-gray-800 font-weight-bold d-block">
+                                            <%
+                                                // Get user full name from session
+                                                String userFullName = (String) session.getAttribute("userFullName");
+                                                if (userFullName != null && !userFullName.trim().isEmpty()) {
+                                                    out.print(userFullName);
+                                                } else {
+                                                    out.print("Guest User");
+                                                }
+                                            %>
+                                        </span>
+                                        <div class="small text-gray-500">Premium Customer</div>
+                                    </div>
+                                    <div class="avatar-circle">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow-lg animated--grow-in border-0">
+                                <div class="dropdown-header bg-primary text-white">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2"></i>
+                                    Account Options
+                                </div>
                                 <a class="dropdown-item" href="#">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
+                                    My Profile
                                 </a>
                                 <a class="dropdown-item" href="#">
                                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Settings
+                                    Account Settings
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-shield-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Security & Privacy
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-bell fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Notification Settings
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="../logout.jsp">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                <a class="dropdown-item text-danger" href="../logout.jsp">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i>
                                     Logout
                                 </a>
                             </div>
@@ -354,7 +497,269 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
+    
+    <style>
+        /* Enhanced Header Styles */
+        .topbar {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
+            border-bottom: 1px solid #e3e6f0;
+            height: 70px;
+            padding: 0 1.5rem;
+        }
+        
+        .navbar-search {
+            max-width: 400px;
+        }
+        
+        .navbar-search .form-control {
+            border-radius: 10rem;
+            background-color: #f8f9fc;
+            border: 1px solid #e3e6f0;
+            transition: all 0.3s ease;
+            height: 40px;
+        }
+        
+        .navbar-search .form-control:focus {
+            background-color: #ffffff;
+            border-color: #4e73df;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+        
+        .navbar-search .btn {
+            border-radius: 0 10rem 10rem 0;
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            border: none;
+            height: 40px;
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin: 0 0.25rem;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(78, 115, 223, 0.1);
+        }
+        
+        .badge-counter {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 0.65rem;
+            border-radius: 50%;
+            min-width: 16px;
+            height: 16px;
+            line-height: 16px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .badge-danger {
+            background-color: #e74a3b;
+        }
+        
+        .badge-primary {
+            background-color: #4e73df;
+        }
+        
+        .avatar-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #ffffff;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+        
+        .avatar-sm {
+            width: 35px;
+            height: 35px;
+        }
+        
+        .dropdown-menu {
+            border-radius: 0.75rem;
+            border: none;
+            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
+            min-width: 280px;
+            overflow: hidden;
+        }
+        
+        .dropdown-header {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1rem 1.5rem;
+            margin: 0;
+            font-size: 0.875rem;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fc;
+            transform: translateX(3px);
+        }
+        
+        .dropdown-item.text-danger:hover {
+            background-color: #f8d7da;
+            color: #721c24 !important;
+        }
+        
+        .dropdown-divider {
+            margin: 0.5rem 0;
+            border-top: 1px solid #e3e6f0;
+        }
+        
+        .topbar-divider {
+            width: 0;
+            border-right: 1px solid #e3e6f0;
+            height: 40px;
+            margin: auto 1rem;
+        }
+        
+        .icon-circle {
+            height: 35px;
+            width: 35px;
+            border-radius: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+        
+        .dropdown-list-image {
+            position: relative;
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 100%;
+            border: 2px solid #fff;
+        }
+        
+        .animated--grow-in {
+            animation-name: growIn;
+            animation-duration: 200ms;
+            animation-timing-function: cubic-bezier(0.18, 1.25, 0.4, 1);
+        }
+        
+        @keyframes growIn {
+            0% {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Ensure proper navbar alignment */
+        .navbar-nav {
+            align-items: center;
+        }
+        
+        .navbar-nav .nav-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Fix dropdown positioning */
+        .dropdown-menu-end {
+            right: 0;
+            left: auto;
+        }
+        
+        /* User info styling */
+        .text-right {
+            text-align: right;
+        }
+        
+        .font-weight-bold {
+            font-weight: 600 !important;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar-search {
+                display: none !important;
+            }
+            
+            .avatar-circle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .topbar-divider {
+                display: none !important;
+            }
+            
+            .topbar {
+                padding: 0 1rem;
+                height: 60px;
+            }
+            
+            .badge-counter {
+                top: 3px;
+                right: 3px;
+                min-width: 14px;
+                height: 14px;
+                line-height: 14px;
+                font-size: 0.6rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dropdown-menu {
+                min-width: 250px;
+            }
+            
+            .nav-link {
+                padding: 0.5rem 0.75rem;
+            }
+        }
+    </style>
     <script>
+        // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarToggleTop = document.getElementById('sidebarToggleTop');
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('sidebar-toggled');
+                    const sidebar = document.querySelector('.sidebar');
+                    if (sidebar) {
+                        sidebar.classList.toggle('toggled');
+                    }
+                });
+            }
+            
+            if (sidebarToggleTop) {
+                sidebarToggleTop.addEventListener('click', function() {
+                    const sidebar = document.querySelector('.sidebar');
+                    if (sidebar) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+            }
+        });
+        
         function quickTransfer() {
             new bootstrap.Modal(document.getElementById('quickTransferModal')).show();
         }
