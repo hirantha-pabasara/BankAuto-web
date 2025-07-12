@@ -1,15 +1,19 @@
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
     <persistence-unit name="BankAutoPU" transaction-type="JTA">
         <jta-data-source>jdbc/BankAutoPool</jta-data-source>
-        <class>lk.jiat.bankauto.core.model.Test</class>
-        <!--         <class>lk.jiat.app.core.model.Product</class> -->
+        <class>lk.jiat.bankauto.core.model.User</class>
+        <class>lk.jiat.bankauto.core.model.BankAccount</class>
         <shared-cache-mode>NONE</shared-cache-mode>
         <properties>
 <!--            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>-->
-            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
-            <property name="eclipselink.ddl-generation.output-mode" value="database"/>
-            <property name="jakarta.persistence.sharedCache.mode" value="NONE"/>
-            <property name="eclipselink.cache.shared.default" value="false"/>
+<!--            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>-->
+<!--            <property name="eclipselink.ddl-generation.output-mode" value="database"/>-->
+<!--            <property name="jakarta.persistence.sharedCache.mode" value="NONE"/>-->
+<!--            <property name="eclipselink.cache.shared.default" value="false"/>-->
+            <property name="jakarta.persistence.schema-generation.database.action" value="none"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
         </properties>
     </persistence-unit>
 </persistence>
