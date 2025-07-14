@@ -1,5 +1,6 @@
 package lk.jiat.bankauto.ejb.bean;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -15,7 +16,11 @@ public class UserSessionBean implements UserService {
 
     @Override
     public User getUser(long id) {
-        return null;
+        try {
+            return entityManager.find(User.class, id);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
@@ -25,7 +30,9 @@ public class UserSessionBean implements UserService {
 
     @Override
     public User getUserByEmail(String email) {
-        return null;
+        return entityManager.createNamedQuery("User.findByEmail", User.class)
+                .setParameter("email", email)
+                .getSingleResult();
     }
 
     @Override
@@ -82,6 +89,24 @@ public class UserSessionBean implements UserService {
                     .getSingleResult();
         }catch (NoResultException e){
             return null;
+        }
+    }
+
+    @Override
+    public boolean validateUser(String email, String password) {
+//        User user =entityManager.createNamedQuery("User.findByEmail", User.class)
+//                .setParameter("email", email).getSingleResult();
+//
+//        return user != null && user.getPassword().equals(password);
+        try {
+            User user = getUserByEmail(email);
+            if (user != null) {
+                BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), user.getPassword());
+                return result.verified;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
         }
     }
 

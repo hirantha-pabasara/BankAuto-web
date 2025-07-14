@@ -18,4 +18,5 @@ public interface UserService {
     boolean isNICExists(String nic);
     boolean isUserExists(String email, String userName, String nic, String phoneNumber);
     User findUserByUsernameOrEmail(String login);
+    boolean validateUser(String email, String password);
 }

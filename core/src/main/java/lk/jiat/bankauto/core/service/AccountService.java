@@ -17,4 +17,5 @@ public interface AccountService {
     BankAccount approveAccount(Long accountId, Long approvedBy);
     BankAccount rejectAccount(Long accountId, Long rejectedBy);
     String generateAccountNumber(String accountType);
+    boolean hasAccountType(Long userId, String accountType);
 }

@@ -131,6 +131,10 @@ public class AccountCreation extends HttpServlet {
             return "You must agree to the terms and conditions";
         }
 
+        if (accountService.hasAccountType(request.getUserId(), request.getAccountType())) {
+            return "You already have a " + request.getAccountType() + ". Only one account per type is allowed.";
+        }
+
         // Validate minimum deposit based on account type
         BigDecimal minDeposit = getMinimumDeposit(request.getAccountType());
         if (request.getInitialDeposit().compareTo(minDeposit) < 0) {

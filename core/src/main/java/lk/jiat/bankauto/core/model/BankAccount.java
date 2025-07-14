@@ -8,7 +8,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table (name = "bank_accounts")
+@Table(name = "bank_accounts")
+@NamedQueries({
+        @NamedQuery(
+                name = "BankAccount.hasAccountType",
+                query = "SELECT COUNT(a) FROM BankAccount a WHERE a.userId = :userId AND a.accountType = :accountType")
+})
 public class BankAccount implements Serializable {
 
     @Id

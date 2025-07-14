@@ -138,4 +138,12 @@ public class AccountSessionBean implements AccountService {
         long number = (long) (Math.random() * 9000000000L) + 1000000000L;
         return prefix + number;
     }
+
+    @Override
+    public boolean hasAccountType(Long userId, String accountType) {
+        TypedQuery<Long> query = em.createNamedQuery("BankAccount.hasAccountType", Long.class);
+        query.setParameter("userId", userId);
+        query.setParameter("accountType", accountType);
+        return query.getSingleResult() > 0;
+    }
 }

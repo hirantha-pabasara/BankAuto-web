@@ -1,8 +1,10 @@
 package lk.jiat.bankauto.core.enums;
 
 public enum TransactionType {
+    TRANSFER,
     DEPOSIT,
     WITHDRAWAL,
-    TRANSFER,
     PAYMENT,
+    INTEREST,
+    FEE
 }

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Flow Logging Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-button { margin: 5px; padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        .test-button:hover { background: #0056b3; }
+        .log-output { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 3px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Transaction Flow Logging Test Page</h1>
+    <p>This page tests all the logging functionality implemented in the transaction flow.</p>
+    
+    <div class="test-section">
+        <h3>1. Logger Initialization Test</h3>
+        <button class="test-button" onclick="testLoggerInit()">Test Logger Init</button>
+        <div id="initTest" class="log-output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Frontend Event Logging Test</h3>
+        <button class="test-button" onclick="testFrontendLogging()">Test Frontend Events</button>
+        <div id="frontendTest" class="log-output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. API Call Simulation Test</h3>
+        <button class="test-button" onclick="testApiLogging()">Test API Logging</button>
+        <div id="apiTest" class="log-output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Validation Logging Test</h3>
+        <button class="test-button" onclick="testValidationLogging()">Test Validation</button>
+        <div id="validationTest" class="log-output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>5. Transfer Flow Simulation</h3>
+        <button class="test-button" onclick="testTransferFlow()">Simulate Complete Transfer</button>
+        <div id="transferTest" class="log-output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>6. Error Handling Test</h3>
+        <button class="test-button" onclick="testErrorLogging()">Test Error Scenarios</button>
+        <div id="errorTest" class="log-output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>7. Performance Logging Test</h3>
+        <button class="test-button" onclick="testPerformanceLogging()">Test Performance Tracking</button>
+        <div id="performanceTest" class="log-output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>8. Debug Panel Test</h3>
+        <button class="test-button" onclick="testDebugPanel()">Open Debug Panel</button>
+        <button class="test-button" onclick="downloadTestLogs()">Download Test Logs</button>
+        <p><small>Press Ctrl+Shift+D to toggle debug panel</small></p>
+    </div>
+
+    <script src="../js/TransactionFlowLogger.js"></script>
+    <script>
+        function updateTestOutput(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            element.innerHTML += `<div class="${type}">[${timestamp}] ${message}</div>`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function testLoggerInit() {
+            updateTestOutput('initTest', 'Testing logger initialization...', 'info');
+            
+            if (window.TransactionLogger) {
+                updateTestOutput('initTest', '✓ TransactionLogger initialized successfully', 'success');
+                updateTestOutput('initTest', `Session ID: ${window.TransactionLogger.sessionId}`, 'info');
+                updateTestOutput('initTest', `Logging enabled: ${window.TransactionLogger.isLoggingEnabled}`, 'info');
+                
+                // Test basic logging
+                window.TransactionLogger.log('info', 'TEST', 'Logger initialization test completed');
+                updateTestOutput('initTest', '✓ Basic logging test completed', 'success');
+            } else {
+                updateTestOutput('initTest', '✗ TransactionLogger not found', 'error');
+            }
+        }
+
+        function testFrontendLogging() {
+            updateTestOutput('frontendTest', 'Testing frontend event logging...', 'info');
+            
+            try {
+                // Test different frontend events
+                window.TransactionLogger.logFrontendEvent('BUTTON_CLICK', {
+                    button: 'test-frontend-logging',
+                    timestamp: new Date().toISOString()
+                });
+                updateTestOutput('frontendTest', '✓ Button click event logged', 'success');
+                
+                window.TransactionLogger.logFrontendEvent('FORM_SUBMIT', {
+                    form: 'test-form',
+                    fields: ['field1', 'field2']
+                });
+                updateTestOutput('frontendTest', '✓ Form submit event logged', 'success');
+                
+                window.TransactionLogger.logFrontendEvent('PAGE_NAVIGATION', {
+                    from: 'test-page',
+                    to: 'transactions'
+                });
+                updateTestOutput('frontendTest', '✓ Page navigation event logged', 'success');
+                
+            } catch (error) {
+                updateTestOutput('frontendTest', `✗ Frontend logging error: ${error.message}`, 'error');
+            }
+        }
+
+        function testApiLogging() {
+            updateTestOutput('apiTest', 'Testing API call logging...', 'info');
+            
+            try {
+                // Simulate API call logging
+                const mockRequestData = {
+                    fromAccountId: 1,
+                    toAccount: 'test@example.com',
+                    amount: 100.50,
+                    transferType: 'IMMEDIATE'
+                };
+                
+                window.TransactionLogger.logApiCall('POST', '/api/transfers/process', mockRequestData);
+                updateTestOutput('apiTest', '✓ API request logged', 'success');
+                
+                // Simulate API response
+                const mockResponseData = {
+                    success: true,
+                    referenceNumber: 'TXN' + Date.now(),
+                    message: 'Transfer completed successfully'
+                };
+                
+                window.TransactionLogger.logApiResponse('/api/transfers/process', 200, mockResponseData, 245.67);
+                updateTestOutput('apiTest', '✓ API response logged', 'success');
+                
+                // Test error response
+                window.TransactionLogger.logApiResponse('/api/transfers/process', 400, 
+                    { success: false, message: 'Invalid request' }, 123.45);
+                updateTestOutput('apiTest', '✓ API error response logged', 'success');
+                
+            } catch (error) {
+                updateTestOutput('apiTest', `✗ API logging error: ${error.message}`, 'error');
+            }
+        }
+
+        function testValidationLogging() {
+            updateTestOutput('validationTest', 'Testing validation logging...', 'info');
+            
+            try {
+                // Test successful validation
+                window.TransactionLogger.logValidation(true, [], 'amount');
+                updateTestOutput('validationTest', '✓ Successful validation logged', 'success');
+                
+                // Test failed validation
+                window.TransactionLogger.logValidation(false, [
+                    'Amount must be greater than 0',
+                    'Insufficient balance'
+                ], 'amount');
+                updateTestOutput('validationTest', '✓ Failed validation logged', 'success');
+                
+                // Test field-specific validation
+                window.TransactionLogger.logValidation(false, ['Invalid email format'], 'toAccount');
+                updateTestOutput('validationTest', '✓ Field-specific validation logged', 'success');
+                
+            } catch (error) {
+                updateTestOutput('validationTest', `✗ Validation logging error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testTransferFlow() {
+            updateTestOutput('transferTest', 'Starting complete transfer flow simulation...', 'info');
+            
+            try {
+                // Start transaction flow
+                const transferData = {
+                    fromAccountId: 1,
+                    toAccount: 'test@example.com',
+                    amount: 150.75,
+                    transferType: 'IMMEDIATE',
+                    description: 'Test transfer'
+                };
+                
+                window.TransactionLogger.startTransactionFlow(transferData);
+                updateTestOutput('transferTest', '✓ Transaction flow started', 'success');
+                
+                // Log transfer steps
+                window.TransactionLogger.logTransferStep('VALIDATION', 'IN_PROGRESS', { step: 1 });
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                window.TransactionLogger.logTransferStep('VALIDATION', 'COMPLETED', { 
+                    validationsPassed: ['amount', 'account', 'balance'] 
+                });
+                updateTestOutput('transferTest', '✓ Validation step logged', 'success');
+                
+                window.TransactionLogger.logTransferStep('PROCESSING', 'IN_PROGRESS', { step: 2 });
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                window.TransactionLogger.logTransferStep('PROCESSING', 'COMPLETED', { 
+                    referenceNumber: 'TXN' + Date.now() 
+                });
+                updateTestOutput('transferTest', '✓ Processing step logged', 'success');
+                
+                // End transaction flow
+                const result = {
+                    success: true,
+                    referenceNumber: 'TXN' + Date.now(),
+                    amount: transferData.amount
+                };
+                
+                window.TransactionLogger.endTransactionFlow(result);
+                updateTestOutput('transferTest', '✓ Transaction flow completed', 'success');
+                
+            } catch (error) {
+                updateTestOutput('transferTest', `✗ Transfer flow error: ${error.message}`, 'error');
+            }
+        }
+
+        function testErrorLogging() {
+            updateTestOutput('errorTest', 'Testing error logging scenarios...', 'info');
+            
+            try {
+                // Test different types of errors
+                const validationError = new Error('Invalid amount: must be positive');
+                validationError.name = 'ValidationError';
+                window.TransactionLogger.logError('VALIDATION', validationError, {
+                    field: 'amount',
+                    value: -50
+                });
+                updateTestOutput('errorTest', '✓ Validation error logged', 'success');
+                
+                const networkError = new Error('Network timeout');
+                networkError.name = 'NetworkError';
+                window.TransactionLogger.logError('API', networkError, {
+                    url: '/api/transfers/process',
+                    timeout: 30000
+                });
+                updateTestOutput('errorTest', '✓ Network error logged', 'success');
+                
+                const systemError = new Error('Database connection failed');
+                systemError.name = 'SystemError';
+                window.TransactionLogger.logError('BACKEND', systemError, {
+                    operation: 'transfer_processing',
+                    userId: 123
+                });
+                updateTestOutput('errorTest', '✓ System error logged', 'success');
+                
+            } catch (error) {
+                updateTestOutput('errorTest', `✗ Error logging error: ${error.message}`, 'error');
+            }
+        }
+
+        function testPerformanceLogging() {
+            updateTestOutput('performanceTest', 'Testing performance logging...', 'info');
+            
+            try {
+                // Test performance timing
+                const timerId = window.TransactionLogger.startTimer('test_operation');
+                updateTestOutput('performanceTest', `✓ Timer started: ${timerId}`, 'success');
+                
+                // Simulate some work
+                setTimeout(() => {
+                    const duration = window.TransactionLogger.endTimer(timerId, 'test_operation');
+                    updateTestOutput('performanceTest', `✓ Timer ended. Duration: ${duration?.toFixed(2)}ms`, 'success');
+                }, 1000);
+                
+                // Test multiple operations
+                const timer1 = window.TransactionLogger.startTimer('validation_check');
+                const timer2 = window.TransactionLogger.startTimer('api_call');
+                
+                setTimeout(() => {
+                    window.TransactionLogger.endTimer(timer1, 'validation_check');
+                    updateTestOutput('performanceTest', '✓ Validation timing logged', 'success');
+                }, 200);
+                
+                setTimeout(() => {
+                    window.TransactionLogger.endTimer(timer2, 'api_call');
+                    updateTestOutput('performanceTest', '✓ API call timing logged', 'success');
+                }, 800);
+                
+            } catch (error) {
+                updateTestOutput('performanceTest', `✗ Performance logging error: ${error.message}`, 'error');
+            }
+        }
+
+        function testDebugPanel() {
+            if (typeof toggleDebugPanel === 'function') {
+                toggleDebugPanel();
+                updateTestOutput('debugTest', '✓ Debug panel toggled', 'success');
+            } else {
+                // Create a simple debug panel for this test
+                if (!document.getElementById('testDebugPanel')) {
+                    const panel = document.createElement('div');
+                    panel.id = 'testDebugPanel';
+                    panel.style.cssText = 'position: fixed; top: 10px; right: 10px; width: 300px; background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; z-index: 9999;';
+                    panel.innerHTML = `
+                        <h6>Debug Panel Test</h6>
+                        <p>Session: ${window.TransactionLogger?.sessionId}</p>
+                        <button onclick="document.getElementById('testDebugPanel').remove()">Close</button>
+                    `;
+                    document.body.appendChild(panel);
+                }
+            }
+        }
+
+        function downloadTestLogs() {
+            if (window.TransactionLogger) {
+                window.TransactionLogger.downloadLogs();
+                updateTestOutput('debugTest', '✓ Test logs downloaded', 'success');
+            } else {
+                updateTestOutput('debugTest', '✗ TransactionLogger not available', 'error');
+            }
+        }
+
+        // Initialize test page
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.TransactionLogger) {
+                window.TransactionLogger.logFrontendEvent('TEST_PAGE_LOAD', {
+                    page: 'transaction-flow-test.html',
+                    timestamp: new Date().toISOString()
+                });
+            }
+            
+            console.log('🧪 Transaction Flow Logging Test Page loaded');
+            console.log('Run tests by clicking the buttons above');
+        });
+    </script>
+</body>
+</html>

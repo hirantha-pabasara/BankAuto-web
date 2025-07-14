@@ -15,11 +15,67 @@
         until backend implementation is complete.
     </description>
 
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>User Area</web-resource-name>
+            <url-pattern>/user/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>SUPER_ADMIN</role-name>
+            <role-name>ADMIN</role-name>
+            <role-name>USER</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Admin Area</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>SUPER_ADMIN</role-name>
+            <role-name>ADMIN</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-role>
+        <role-name>SUPER_ADMIN</role-name>
+    </security-role>
+    <security-role>
+        <role-name>ADMIN</role-name>
+    </security-role>
+    <security-role>
+        <role-name>USER</role-name>
+    </security-role>
+
     <!-- Welcome Files -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Public Resource</web-resource-name>
+            <url-pattern>/</url-pattern>
+            <url-pattern>/index.jsp</url-pattern>
+            <url-pattern>/index.html</url-pattern>
+            <url-pattern>/user/login.jsp</url-pattern>
+            <url-pattern>/user/register.jsp</url-pattern>
+            <url-pattern>/user/create-account.jsp</url-pattern>
+            <url-pattern>/user/signup.jsp</url-pattern>
+            <url-pattern>/user/login</url-pattern>
+            <url-pattern>/user/register</url-pattern>
+            <url-pattern>/user/signup</url-pattern>
+            <url-pattern>/user/create-account</url-pattern>
+            <url-pattern>/css/*</url-pattern>
+            <url-pattern>/js/*</url-pattern>
+            <url-pattern>/images/*</url-pattern>
+            <url-pattern>/assets/*</url-pattern>
+            <url-pattern>/static/*</url-pattern>
+            <url-pattern>/error/*</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
 
     <!-- Session Configuration -->
     <session-config>
@@ -53,35 +109,36 @@
     </mime-mapping>
 
     <!-- Error Pages -->
-    <error-page>
-        <error-code>404</error-code>
-        <location>/error/404.jsp</location>
-    </error-page>
-    <error-page>
-        <error-code>500</error-code>
-        <location>/error/500.jsp</location>
-    </error-page>
-    <error-page>
-        <error-code>403</error-code>
-        <location>/error/403.jsp</location>
-    </error-page>
-    <error-page>
-        <exception-type>java.lang.Exception</exception-type>
-        <location>/error/general.jsp</location>
-    </error-page>
+<!--    <error-page>-->
+<!--        <error-code>404</error-code>-->
+<!--        <location>/error/404.jsp</location>-->
+<!--    </error-page>-->
+<!--    <error-page>-->
+<!--        <error-code>500</error-code>-->
+<!--        <location>/error/500.jsp</location>-->
+<!--    </error-page>-->
+<!--    <error-page>-->
+<!--        <error-code>403</error-code>-->
+<!--        <location>/error/403.jsp</location>-->
+<!--    </error-page>-->
+<!--    <error-page>-->
+<!--        <exception-type>java.lang.Exception</exception-type>-->
+<!--        <location>/error/general.jsp</location>-->
+<!--    </error-page>-->
+    
 
     <!-- Context Parameters -->
-    <context-param>
-        <param-name>application.name</param-name>
-        <param-value>BankAuto</param-value>
-    </context-param>
-    <context-param>
-        <param-name>application.version</param-name>
-        <param-value>1.0.0</param-value>
-    </context-param>
-    <context-param>
-        <param-name>development.mode</param-name>
-        <param-value>true</param-value>
-    </context-param>
+<!--    <context-param>-->
+<!--        <param-name>application.name</param-name>-->
+<!--        <param-value>BankAuto</param-value>-->
+<!--    </context-param>-->
+<!--    <context-param>-->
+<!--        <param-name>application.version</param-name>-->
+<!--        <param-value>1.0.0</param-value>-->
+<!--    </context-param>-->
+<!--    <context-param>-->
+<!--        <param-name>development.mode</param-name>-->
+<!--        <param-value>true</param-value>-->
+<!--    </context-param>-->
 
 </web-app>

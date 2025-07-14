@@ -1,6 +1,7 @@
 package lk.jiat.bankauto.core.model;
 
 import jakarta.persistence.*;
+import lk.jiat.bankauto.core.enums.UserRole;
 
 import java.io.Serializable;
 
@@ -9,6 +10,7 @@ import java.io.Serializable;
         @NamedQuery(name = "User.findByEmail", query = "select u from User u where u.email=:email"),
         @NamedQuery(name = "User.findAll", query = "select u from User u"),
         @NamedQuery(name = "User.findByUsernameOrEmail", query = "select u from User u where u.userName=:login OR u.email=:login"),
+        @NamedQuery(name = "User.findByEmailAndPassword", query = "select u from User u where u.email=:email and u.password=:password"),
 })
 public class User implements Serializable {
 
@@ -42,6 +44,9 @@ public class User implements Serializable {
 
     @Column(name = "nic", length = 12, nullable = true, unique = true)
     private String NIC;
+
+   @Enumerated(EnumType.STRING)
+    private UserRole role = UserRole.USER;
 
     public User() {
     }
@@ -138,5 +143,13 @@ public class User implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 }

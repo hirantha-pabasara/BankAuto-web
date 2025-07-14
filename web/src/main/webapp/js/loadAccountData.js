@@ -57,9 +57,17 @@ class AccountDataLoader {
      * Display all account data in UI
      */
     displayAccountData() {
-        this.updateAccountCards();
-        this.updateAccountTable();
-        this.updateAccountSummary();
+        // Check if we're on the transactions page
+        const isTransactionPage = window.location.pathname.includes('transactions.jsp');
+        
+        if (isTransactionPage) {
+            this.initTransactionPage();
+        } else {
+            // Regular dashboard/account pages
+            this.updateAccountCards();
+            this.updateAccountTable();
+            this.updateAccountSummary();
+        }
     }
 
     /**
@@ -222,6 +230,79 @@ class AccountDataLoader {
     }
 
     /**
+     * Populate account filter dropdown for transactions page
+     */
+    populateAccountFilter() {
+        const accountFilter = document.getElementById('accountFilter');
+        if (!accountFilter) return;
+
+        // Clear existing options except the first one (All Accounts)
+        while (accountFilter.children.length > 1) {
+            accountFilter.removeChild(accountFilter.lastChild);
+        }
+
+        // Add options for each account
+        this.accountsData.forEach(account => {
+            if (account.status === 'ACTIVE') {
+                const option = document.createElement('option');
+                option.value = account.id;
+                option.textContent = `${account.accountType} - ****${account.accountNumber.slice(-4)}`;
+                accountFilter.appendChild(option);
+            }
+        });
+    }
+
+    /**
+     * Populate from account dropdown for transfer modal
+     */
+    populateFromAccountDropdown() {
+        const fromAccountSelect = document.getElementById('fromAccount');
+        if (!fromAccountSelect) return;
+
+        // Clear existing options except the first one
+        while (fromAccountSelect.children.length > 1) {
+            fromAccountSelect.removeChild(fromAccountSelect.lastChild);
+        }
+
+        // Add options for each active account
+        this.accountsData.forEach(account => {
+            if (account.status === 'ACTIVE') {
+                const option = document.createElement('option');
+                option.value = account.id;
+                option.textContent = `${account.accountType} - ${this.formatCurrency(account.balance, account.currency)} (****${account.accountNumber.slice(-4)})`;
+                option.dataset.accountType = account.accountType;
+                option.dataset.balance = account.balance;
+                fromAccountSelect.appendChild(option);
+            }
+        });
+    }
+
+    /**
+     * Get account data by ID (useful for transaction processing)
+     */
+    getAccountById(accountId) {
+        return this.accountsData.find(account => account.id == accountId);
+    }
+
+    /**
+     * Initialize transaction page specific functionality
+     */
+    initTransactionPage() {
+        this.populateAccountFilter();
+        this.populateFromAccountDropdown();
+        
+        // Pre-select account if URL parameter exists
+        const urlParams = new URLSearchParams(window.location.search);
+        const fromAccountId = urlParams.get('from');
+        if (fromAccountId) {
+            const fromAccountSelect = document.getElementById('fromAccount');
+            if (fromAccountSelect) {
+                fromAccountSelect.value = fromAccountId;
+            }
+        }
+    }
+
+    /**
      * Utility methods for styling and formatting
      */
     getAccountColor(accountType) {
@@ -316,6 +397,9 @@ function generateStatement(accountId) {
 document.addEventListener('DOMContentLoaded', function() {
     const loader = new AccountDataLoader();
     loader.init();
+    
+    // Make loader globally available for transaction processing
+    window.accountDataLoader = loader;
 });
 
 // Export for other scripts

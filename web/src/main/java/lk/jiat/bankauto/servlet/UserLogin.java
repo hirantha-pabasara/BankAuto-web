@@ -1,9 +1,13 @@
 package lk.jiat.bankauto.servlet;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import jakarta.ejb.EJB;
+import jakarta.inject.Inject;
+import jakarta.security.enterprise.AuthenticationStatus;
+import jakarta.security.enterprise.SecurityContext;
+import jakarta.security.enterprise.authentication.mechanism.http.AuthenticationParameters;
+import jakarta.security.enterprise.credential.UsernamePasswordCredential;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,6 +25,9 @@ import java.io.PrintWriter;
 @WebServlet("/user/login")
 public class UserLogin extends HttpServlet {
 
+    @Inject
+    private SecurityContext securityContext;
+
     @EJB
     private UserService userService;
 
@@ -30,6 +37,7 @@ public class UserLogin extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try {
+            // Read JSON request
             BufferedReader reader = request.getReader();
             StringBuilder jsonString = new StringBuilder();
             String line;
@@ -40,36 +48,44 @@ public class UserLogin extends HttpServlet {
             Gson gson = new GsonBuilder().create();
             LoginRequest loginRequest = gson.fromJson(jsonString.toString(), LoginRequest.class);
 
-            User user = userService.findUserByUsernameOrEmail(loginRequest.getLogin());
-
-            if (user == null) {
-                ResponseMessage message = new ResponseMessage(false, "Invalid username/email or password");
+            if (loginRequest.getLogin() == null || loginRequest.getPassword() == null) {
+                ResponseMessage message = new ResponseMessage(false, "Username and password are required");
                 PrintWriter out = response.getWriter();
                 out.write(gson.toJson(message));
                 out.flush();
                 return;
             }
 
-            BCrypt.Result result = BCrypt.verifyer().verify(loginRequest.getPassword().toCharArray(), user.getPassword());
+            // Use Jakarta Security for authentication
+            AuthenticationParameters parameters = AuthenticationParameters.withParams()
+                    .credential(new UsernamePasswordCredential(
+                            loginRequest.getLogin(),
+                            loginRequest.getPassword()
+                    ));
 
-            if (!result.verified) {
+            AuthenticationStatus status = securityContext.authenticate(request, response, parameters);
+
+            if (status == AuthenticationStatus.SUCCESS) {
+                // Authentication successful - create session objects
+                User user = userService.findUserByUsernameOrEmail(loginRequest.getLogin());
+
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
+                session.setAttribute("userId", user.getId());
+                session.setAttribute("username", user.getUserName());
+                session.setAttribute("userFullName", user.getFname() + " " + user.getLname());
+                session.setAttribute("userRole", user.getRole().name());
+
+                ResponseMessage message = new ResponseMessage(true, "Login successful");
+                PrintWriter out = response.getWriter();
+                out.write(gson.toJson(message));
+                out.flush();
+            } else {
                 ResponseMessage message = new ResponseMessage(false, "Invalid username/email or password");
                 PrintWriter out = response.getWriter();
                 out.write(gson.toJson(message));
                 out.flush();
-                return;
             }
-
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("username", user.getUserName());
-            session.setAttribute("userFullName", user.getFname() + " " + user.getLname());
-
-            ResponseMessage message = new ResponseMessage(true, "Login successful");
-            PrintWriter out = response.getWriter();
-            out.write(gson.toJson(message));
-            out.flush();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,5 +108,4 @@ public class UserLogin extends HttpServlet {
             return password;
         }
     }
-
 }

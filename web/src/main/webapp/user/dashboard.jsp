@@ -497,6 +497,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
+    <script src="../js/loadDashboardData.js"></script>
     
     <style>
         /* Enhanced Header Styles */
@@ -765,9 +766,62 @@
         }
         
         function processTransfer() {
-            // TODO: Implement backend transfer
-            alert('Transfer initiated successfully!');
-            bootstrap.Modal.getInstance(document.getElementById('quickTransferModal')).hide();
+            const button = document.getElementById('transferButton') || event.target;
+            const originalText = button.textContent;
+            
+            // Prevent multiple submissions
+            if (button.disabled) return;
+            
+            // Set loading state
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+            
+            try {
+                // Basic validation
+                const fromAccount = document.getElementById('fromAccount')?.value;
+                const toAccount = document.getElementById('toAccount')?.value;
+                const amount = document.getElementById('amount')?.value;
+                
+                if (!fromAccount || !toAccount || !amount) {
+                    throw new Error('Please fill in all required fields');
+                }
+                
+                if (parseFloat(amount) <= 0) {
+                    throw new Error('Please enter a valid amount');
+                }
+                
+                // Simulate transfer processing
+                setTimeout(() => {
+                    try {
+                        // TODO: Replace with actual backend integration
+                        alert('Transfer initiated successfully!');
+                        bootstrap.Modal.getInstance(document.getElementById('quickTransferModal')).hide();
+                        
+                        // Reset form
+                        document.getElementById('quickTransferModal').querySelector('form').reset();
+                        
+                        // Refresh page data
+                        if (typeof refreshPageContent === 'function') {
+                            refreshPageContent();
+                        } else {
+                            // Fallback: reload page after short delay
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        }
+                        
+                    } finally {
+                        // Reset button state
+                        button.disabled = false;
+                        button.textContent = originalText;
+                    }
+                }, 1500); // Simulate processing time
+                
+            } catch (error) {
+                alert('Error: ' + error.message);
+                button.disabled = false;
+                button.textContent = originalText;
+            }
         }
         
         function payBills() {
