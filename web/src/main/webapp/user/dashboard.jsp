@@ -84,17 +84,13 @@
                         <i class="fa fa-bars"></i>
                     </button>
                     
-                    <!-- Search Bar -->
-                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search transactions, accounts..." aria-label="Search">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
+                    <!-- Bank Brand/Welcome Message -->
+                    <div class="d-none d-md-flex align-items-center mr-auto ml-3">
+                        <div class="welcome-message">
+                            <h5 class="mb-0 text-primary font-weight-bold">BankAuto</h5>
+                            <small class="text-muted">Digital Banking Platform</small>
                         </div>
-                    </form>
+                    </div>
                     
                     <!-- Navbar Right Items -->
                     <ul class="navbar-nav ml-auto">
@@ -193,11 +189,11 @@
                         <div class="topbar-divider d-none d-sm-block"></div>
                         
                         <!-- User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <li class="nav-item">
+                            <div class="nav-link user-profile-display">
                                 <div class="d-flex align-items-center">
-                                    <div class="mr-2 d-none d-lg-block text-right">
-                                        <span class="text-gray-800 font-weight-bold d-block">
+                                    <div class="mr-3 d-none d-lg-block text-right user-info">
+                                        <span class="text-gray-800 font-weight-bold d-block user-name">
                                             <%
                                                 // Get user full name from session
                                                 String userFullName = (String) session.getAttribute("userFullName");
@@ -208,39 +204,34 @@
                                                 }
                                             %>
                                         </span>
-                                        <div class="small text-gray-500">Premium Customer</div>
+                                        <div class="small text-primary font-weight-medium user-status">Premium Customer</div>
+                                        <div class="small text-muted user-last-login">
+                                            <i class="fas fa-clock fa-sm mr-1"></i>Last login: Today
+                                        </div>
                                     </div>
-                                    <div class="avatar-circle">
-                                        <i class="fas fa-user text-white"></i>
+                                    <div class="avatar-circle-enhanced">
+                                        <%
+                                            // Get user initials for avatar
+                                            String initials = "GU";
+                                            if (userFullName != null && !userFullName.trim().isEmpty()) {
+                                                String[] names = userFullName.split(" ");
+                                                if (names.length >= 2) {
+                                                    initials = names[0].substring(0, 1).toUpperCase() + names[names.length - 1].substring(0, 1).toUpperCase();
+                                                } else if (names.length == 1) {
+                                                    initials = names[0].substring(0, Math.min(2, names[0].length())).toUpperCase();
+                                                }
+                                            }
+                                        %>
+                                        <span class="avatar-initials"><%= initials %></span>
+                                        <div class="online-indicator"></div>
+                                    </div>
+                                    <div class="ml-3">
+                                        <a href="../logout.jsp" class="btn btn-outline-danger btn-sm logout-btn">
+                                            <i class="fas fa-sign-out-alt fa-sm"></i>
+                                            <span class="d-none d-md-inline ml-1">Logout</span>
+                                        </a>
                                     </div>
                                 </div>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right shadow-lg animated--grow-in border-0">
-                                <div class="dropdown-header bg-primary text-white">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2"></i>
-                                    Account Options
-                                </div>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    My Profile
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Account Settings
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-shield-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Security & Privacy
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-bell fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Notification Settings
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="../logout.jsp">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i>
-                                    Logout
-                                </a>
                             </div>
                         </li>
                     </ul>
@@ -504,33 +495,105 @@
         .topbar {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
             border-bottom: 1px solid #e3e6f0;
-            height: 70px;
-            padding: 0 1.5rem;
+            height: 80px;
+            padding: 0 2rem;
         }
         
-        .navbar-search {
-            max-width: 400px;
-        }
-        
-        .navbar-search .form-control {
-            border-radius: 10rem;
-            background-color: #f8f9fc;
-            border: 1px solid #e3e6f0;
-            transition: all 0.3s ease;
-            height: 40px;
-        }
-        
-        .navbar-search .form-control:focus {
-            background-color: #ffffff;
-            border-color: #4e73df;
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-        }
-        
-        .navbar-search .btn {
-            border-radius: 0 10rem 10rem 0;
+        .welcome-message h5 {
             background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
-            border: none;
-            height: 40px;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2px;
+        }
+        
+        .user-profile-display {
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(78, 115, 223, 0.05) 0%, rgba(78, 115, 223, 0.1) 100%);
+            border: 1px solid rgba(78, 115, 223, 0.1);
+            margin-right: 1rem;
+        }
+        
+        .user-profile-display:hover {
+            background: linear-gradient(135deg, rgba(78, 115, 223, 0.1) 0%, rgba(78, 115, 223, 0.15) 100%);
+            border-color: rgba(78, 115, 223, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(78, 115, 223, 0.15);
+        }
+        
+        .user-info .user-name {
+            font-size: 1rem;
+            margin-bottom: 2px;
+            color: #2c3e50;
+        }
+        
+        .user-info .user-status {
+            font-size: 0.8rem;
+            margin-bottom: 1px;
+        }
+        
+        .user-info .user-last-login {
+            font-size: 0.75rem;
+        }
+        
+        .avatar-circle-enhanced {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .avatar-circle-enhanced:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        
+        .avatar-initials {
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 16px;
+            height: 16px;
+            background-color: #1cc88a;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(28, 200, 138, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(28, 200, 138, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(28, 200, 138, 0); }
+        }
+        
+        .logout-btn {
+            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .logout-btn:hover {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
         }
         
         .nav-link {
@@ -543,28 +606,38 @@
         
         .nav-link:hover {
             background-color: rgba(78, 115, 223, 0.1);
+            transform: translateY(-1px);
         }
         
         .badge-counter {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 8px;
+            right: 8px;
             font-size: 0.65rem;
             border-radius: 50%;
-            min-width: 16px;
-            height: 16px;
-            line-height: 16px;
+            min-width: 18px;
+            height: 18px;
+            line-height: 18px;
             text-align: center;
             color: white;
             font-weight: bold;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-3px); }
+            60% { transform: translateY(-1px); }
         }
         
         .badge-danger {
-            background-color: #e74a3b;
+            background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
+            box-shadow: 0 2px 4px rgba(231, 74, 59, 0.3);
         }
         
         .badge-primary {
-            background-color: #4e73df;
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            box-shadow: 0 2px 4px rgba(78, 115, 223, 0.3);
         }
         
         .avatar-circle {
@@ -697,42 +770,106 @@
         
         /* Responsive adjustments */
         @media (max-width: 768px) {
-            .navbar-search {
+            .user-info {
                 display: none !important;
             }
             
-            .avatar-circle {
-                width: 40px;
-                height: 40px;
+            .avatar-circle-enhanced {
+                width: 45px;
+                height: 45px;
             }
             
-            .topbar-divider {
+            .avatar-initials {
+                font-size: 1rem;
+            }
+            
+            .online-indicator {
+                width: 14px;
+                height: 14px;
+            }
+            
+            .welcome-message {
                 display: none !important;
+            }
+            
+            .user-profile-display {
+                padding: 0.5rem 1rem !important;
+                margin-right: 0.5rem;
             }
             
             .topbar {
                 padding: 0 1rem;
-                height: 60px;
+                height: 65px;
             }
             
             .badge-counter {
                 top: 3px;
                 right: 3px;
-                min-width: 14px;
-                height: 14px;
-                line-height: 14px;
+                min-width: 16px;
+                height: 16px;
+                line-height: 16px;
                 font-size: 0.6rem;
+            }
+            
+            .logout-btn span {
+                display: none !important;
+            }
+            
+            .logout-btn {
+                padding: 0.4rem 0.6rem;
             }
         }
         
         @media (max-width: 576px) {
             .dropdown-menu {
                 min-width: 250px;
+                margin-right: 1rem;
             }
             
             .nav-link {
                 padding: 0.5rem 0.75rem;
             }
+            
+            .topbar {
+                height: 60px;
+            }
+            
+            .avatar-circle-enhanced {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .avatar-initials {
+                font-size: 0.9rem;
+            }
+            
+            .user-profile-display {
+                padding: 0.4rem 0.8rem !important;
+            }
+        }
+        
+        /* Fix for content wrapper to prevent overlap */
+        #content-wrapper {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        /* Improved dropdown positioning */
+        .dropdown-menu-end {
+            right: 0;
+            left: auto;
+            margin-top: 0.5rem;
+        }
+        
+        /* Better notification alignment */
+        .navbar-nav {
+            align-items: center;
+            padding-right: 1rem;
+        }
+        
+        .navbar-nav .nav-item {
+            display: flex;
+            align-items: center;
         }
     </style>
     <script>

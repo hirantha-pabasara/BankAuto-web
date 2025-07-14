@@ -43,7 +43,7 @@ public class TransactionSessionBean implements TransferService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-//    @RolesAllowed({"USER", "ADMIN"})
+    @RolesAllowed({"USER", "ADMIN"})
     public TransferResult processImmediateTransfer(TransferRequest request) {
         logger.info("=================================================================");
         logger.info("IMMEDIATE TRANSFER PROCESSING STARTED");
@@ -165,7 +165,7 @@ public class TransactionSessionBean implements TransferService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-//    @RolesAllowed({"USER", "ADMIN"})
+    @RolesAllowed({"USER", "ADMIN"})
     public TransferResult scheduleTransfer(TransferRequest request) {
         logger.info("Scheduling transfer for: " + request.getScheduledDateTime());
 
@@ -219,7 +219,7 @@ public class TransactionSessionBean implements TransferService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-//    @RolesAllowed({"USER", "ADMIN"})
+    @RolesAllowed({"USER", "ADMIN"})
     public TransferResult setupRecurringTransfer(TransferRequest request) {
         logger.info("Setting up recurring transfer with frequency: " + request.getFrequency());
 
@@ -347,7 +347,7 @@ public class TransactionSessionBean implements TransferService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
-//    @RolesAllowed({"USER", "ADMIN"})
+    @RolesAllowed({"USER", "ADMIN"})
     public List<Transaction> getTransactionHistory(Long accountId, LocalDateTime startDate, LocalDateTime endDate) {
         try {
             TypedQuery<Transaction> query;
@@ -373,7 +373,7 @@ public class TransactionSessionBean implements TransferService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
-//    @RolesAllowed({"USER", "ADMIN"})
+    @RolesAllowed({"USER", "ADMIN"})
     public Transaction getTransactionById(Long transactionId) {
         try {
             return em.find(Transaction.class, transactionId);
@@ -385,7 +385,7 @@ public class TransactionSessionBean implements TransferService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-//    @RolesAllowed({"USER", "ADMIN"})
+    @RolesAllowed({"USER", "ADMIN"})
     public boolean cancelTransfer(Long transactionId, Long userId) {
         try {
             Transaction transaction = em.find(Transaction.class, transactionId);
@@ -502,7 +502,7 @@ public class TransactionSessionBean implements TransferService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
-//    @RolesAllowed({"USER", "ADMIN"})
+    @RolesAllowed({"USER", "ADMIN"})
     public List<Transaction> getPendingTransfers(Long userId) {
         try {
             TypedQuery<Transaction> query = em.createQuery(
