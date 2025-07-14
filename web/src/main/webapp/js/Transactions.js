@@ -232,6 +232,9 @@ function handleTransferTypeChange() {
         recurringFields.style.display = 'block';
         startDate.required = true;
         
+        const frequency = document.getElementById('frequency');
+        if (frequency) frequency.required = true;
+        
         // Set minimum date to today
         const today = new Date().toISOString().split('T')[0];
         startDate.min = today;
@@ -247,6 +250,10 @@ function handleTransferTypeChange() {
     }
     if (startDate) {
         startDate.classList.remove('is-invalid', 'is-valid');
+    }
+    const frequency = document.getElementById('frequency');
+    if (frequency) {
+        frequency.classList.remove('is-invalid', 'is-valid');
     }
 }
 
@@ -383,6 +390,7 @@ function validateTransferForm() {
     } else if (formFields.transferType === 'RECURRING') {
         const startDate = document.getElementById('startDate');
         const endDate = document.getElementById('endDate');
+        const frequency = document.getElementById('frequency');
         
         if (startDate && !startDate.value) {
             errors.push('Please select a start date for recurring transfer');
@@ -390,6 +398,11 @@ function validateTransferForm() {
         } else if (startDate && new Date(startDate.value) < new Date().setHours(0,0,0,0)) {
             errors.push('Start date cannot be in the past');
             invalidFields.push('startDate');
+        }
+        
+        if (frequency && !frequency.value) {
+            errors.push('Please select frequency for recurring transfer');
+            invalidFields.push('frequency');
         }
         
         if (endDate && startDate && endDate.value && new Date(endDate.value) <= new Date(startDate.value)) {

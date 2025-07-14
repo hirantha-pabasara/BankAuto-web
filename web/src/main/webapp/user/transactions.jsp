@@ -219,11 +219,14 @@
                                     <div class="form-group mb-3">
                                         <label for="frequency" class="form-label">Frequency: <span class="text-danger">*</span></label>
                                         <select class="form-control" id="frequency">
+                                            <option value="">Select frequency</option>
+                                            <option value="DAILY">Daily</option>
                                             <option value="WEEKLY">Weekly</option>
                                             <option value="MONTHLY">Monthly</option>
                                             <option value="QUARTERLY">Quarterly</option>
                                             <option value="ANNUALLY">Annually</option>
                                         </select>
+                                        <div class="invalid-feedback">Please select frequency</div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">

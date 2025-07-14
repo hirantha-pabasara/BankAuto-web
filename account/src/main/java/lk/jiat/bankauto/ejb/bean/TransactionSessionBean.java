@@ -245,12 +245,24 @@ public class TransactionSessionBean implements TransferService {
             transaction.setStartDate(request.getStartDate());
             transaction.setEndDate(request.getEndDate());
             transaction.setFrequency(RecurrenceFrequency.valueOf(request.getFrequency()));
-            transaction.setNextExecutionDate(calculateNextExecutionDate(request.getStartDate(), request.getFrequency()));
+            
+            // Calculate next execution date - if start date is in the past, use current time
+            LocalDateTime nextExecution = request.getStartDate();
+            LocalDateTime now = LocalDateTime.now();
+            
+            // If start date is in the past, start from the next interval from now
+            if (nextExecution.isBefore(now)) {
+                nextExecution = now;
+            }
+            
+            transaction.setNextExecutionDate(calculateNextExecutionDate(nextExecution, request.getFrequency()));
 
             em.persist(transaction);
             em.flush();
 
-            logger.info("Recurring transfer setup successfully: " + transaction.getReferenceNumber());
+            logger.info("Recurring transfer setup successfully: " + transaction.getReferenceNumber() + 
+                       ", Next execution: " + transaction.getNextExecutionDate() + 
+                       ", Frequency: " + request.getFrequency());
             return TransferResult.success("Recurring transfer setup successfully", transaction.getReferenceNumber());
 
         } catch (Exception e) {
@@ -833,6 +845,8 @@ public class TransactionSessionBean implements TransferService {
 
     private LocalDateTime calculateNextExecutionDate(LocalDateTime startDate, String frequency) {
         switch (RecurrenceFrequency.valueOf(frequency)) {
+            case DAILY:
+                return startDate.plusDays(1);
             case WEEKLY:
                 return startDate.plusWeeks(1);
             case MONTHLY:
