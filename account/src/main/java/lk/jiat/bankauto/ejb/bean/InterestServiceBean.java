@@ -82,22 +82,34 @@ public class InterestServiceBean implements InterestService {
     @Override
     public int applyInterestToAllAccounts() {
         int accountsProcessed = 0;
+        BigDecimal totalInterestPaid = BigDecimal.ZERO;
         
         try {
-            // Get all active accounts
+            logger.info("Starting interest calculation for all accounts...");
+            
+            // Get all active accounts with positive balance
             TypedQuery<BankAccount> query = em.createQuery(
                 "SELECT a FROM BankAccount a WHERE a.status = :status AND a.balance > 0", 
                 BankAccount.class);
             query.setParameter("status", AccountStatus.ACTIVE);
             
             List<BankAccount> accounts = query.getResultList();
+            logger.info("Found " + accounts.size() + " eligible accounts for interest calculation");
             
             for (BankAccount account : accounts) {
-                applyInterestToAccount(account.getId());
-                accountsProcessed++;
+                try {
+                    BigDecimal interestApplied = applyInterestToAccountInternal(account);
+                    if (interestApplied.compareTo(BigDecimal.ZERO) > 0) {
+                        totalInterestPaid = totalInterestPaid.add(interestApplied);
+                        accountsProcessed++;
+                    }
+                } catch (Exception e) {
+                    logger.warning("Failed to apply interest to account " + account.getAccountNumber() + ": " + e.getMessage());
+                    // Continue with other accounts even if one fails
+                }
             }
             
-            logger.info("Applied interest to " + accountsProcessed + " accounts");
+            logger.info("Interest calculation completed. Processed " + accountsProcessed + " accounts. Total interest paid: $" + totalInterestPaid);
             
         } catch (Exception e) {
             logger.severe("Error applying interest to all accounts: " + e.getMessage());
@@ -112,32 +124,51 @@ public class InterestServiceBean implements InterestService {
         try {
             BankAccount account = em.find(BankAccount.class, accountId);
             
-            if (account != null && account.getStatus() == AccountStatus.ACTIVE && 
-                account.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-                
-                BigDecimal interestRate = getInterestRate(account.getAccountType());
-                
-                // Calculate monthly interest (annual rate / 12)
-                BigDecimal monthlyRate = interestRate.divide(new BigDecimal("12"), 6, RoundingMode.HALF_UP);
-                
-                // Calculate interest amount
-                BigDecimal interestAmount = account.getBalance()
-                    .multiply(monthlyRate.divide(new BigDecimal("100"), 6, RoundingMode.HALF_UP))
-                    .setScale(2, RoundingMode.HALF_UP);
-                
-                // Add interest to account balance
-                BigDecimal newBalance = account.getBalance().add(interestAmount);
-                account.setBalance(newBalance);
-                
-                em.merge(account);
-                
-                logger.info("Applied interest of $" + interestAmount + " to account " + 
-                           account.getAccountNumber() + ". New balance: $" + newBalance);
+            if (account != null) {
+                BigDecimal interestApplied = applyInterestToAccountInternal(account);
+                if (interestApplied.compareTo(BigDecimal.ZERO) > 0) {
+                    logger.info("Applied interest of $" + interestApplied + " to account " + account.getAccountNumber());
+                } else {
+                    logger.info("No interest applied to account " + account.getAccountNumber() + " (inactive or zero balance)");
+                }
+            } else {
+                logger.warning("Account not found with ID: " + accountId);
             }
             
         } catch (Exception e) {
             logger.severe("Error applying interest to account " + accountId + ": " + e.getMessage());
+            throw new RuntimeException("Failed to apply interest to account", e);
         }
+    }
+
+    /**
+     * Internal method to apply interest to a specific account
+     * @param account The account to apply interest to
+     * @return The amount of interest applied
+     */
+    private BigDecimal applyInterestToAccountInternal(BankAccount account) {
+        if (account == null || account.getStatus() != AccountStatus.ACTIVE || 
+            account.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+        
+        BigDecimal interestRate = getInterestRate(account.getAccountType());
+        
+        // Calculate monthly interest (annual rate / 12)
+        BigDecimal monthlyRate = interestRate.divide(new BigDecimal("12"), 6, RoundingMode.HALF_UP);
+        
+        // Calculate interest amount
+        BigDecimal interestAmount = account.getBalance()
+            .multiply(monthlyRate.divide(new BigDecimal("100"), 6, RoundingMode.HALF_UP))
+            .setScale(2, RoundingMode.HALF_UP);
+        
+        // Add interest to account balance
+        BigDecimal newBalance = account.getBalance().add(interestAmount);
+        account.setBalance(newBalance);
+        
+        em.merge(account);
+        
+        return interestAmount;
     }
 
     @Override

@@ -713,15 +713,11 @@
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying Interest...';
             
             try {
-                const params = new URLSearchParams();
-                params.append('action', 'apply');
-                
-                const response = await fetch('update-interest', {
+                const response = await fetch('trigger-interest', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: params
+                        'Content-Type': 'application/json'
+                    }
                 });
                 
                 if (!response.ok) {
@@ -738,7 +734,7 @@
                 
             } catch (error) {
                 console.error('Error applying interest:', error);
-                showStatus('Failed to apply interest to accounts', 'danger');
+                showStatus('Failed to apply interest to accounts. Error: ' + error.message, 'danger');
             } finally {
                 button.disabled = false;
                 button.innerHTML = originalHTML;
