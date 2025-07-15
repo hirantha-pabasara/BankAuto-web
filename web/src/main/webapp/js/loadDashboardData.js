@@ -57,7 +57,7 @@ class DashboardDataLoader {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    window.location.href = '../login.jsp';
+                    window.location.href = '../user/login.jsp';
                     return;
                 }
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);

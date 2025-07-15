@@ -93,7 +93,7 @@
                     </div>
                     
                     <!-- Navbar Right Items -->
-                    <ul class="navbar-nav ml-auto">
+                    <ul class="navbar-nav ml-auto d-flex align-items-center justify-content-end w-100">
                         <!-- Notifications Dropdown -->
                         <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -191,7 +191,7 @@
                         <!-- User Information -->
                         <li class="nav-item">
                             <div class="nav-link user-profile-display">
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-end">
                                     <div class="mr-3 d-none d-lg-block text-right user-info">
                                         <span class="text-gray-800 font-weight-bold d-block user-name">
                                             <%
@@ -226,7 +226,8 @@
                                         <div class="online-indicator"></div>
                                     </div>
                                     <div class="ml-3">
-                                        <a href="../logout.jsp" class="btn btn-outline-danger btn-sm logout-btn">
+                                        <!-- <a href="../logout.jsp" class="btn btn-outline-danger btn-sm logout-btn"> -->
+                                            <a href="../user/logout" class="btn btn-outline-danger btn-sm logout-btn">
                                             <i class="fas fa-sign-out-alt fa-sm"></i>
                                             <span class="d-none d-md-inline ml-1">Logout</span>
                                         </a>
@@ -513,7 +514,8 @@
             transition: all 0.3s ease;
             background: linear-gradient(135deg, rgba(78, 115, 223, 0.05) 0%, rgba(78, 115, 223, 0.1) 100%);
             border: 1px solid rgba(78, 115, 223, 0.1);
-            margin-right: 1rem;
+            margin-right: 0;
+            margin-left: auto;
         }
         
         .user-profile-display:hover {

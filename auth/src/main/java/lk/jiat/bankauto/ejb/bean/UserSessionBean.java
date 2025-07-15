@@ -5,8 +5,11 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import lk.jiat.bankauto.core.model.User;
 import lk.jiat.bankauto.core.service.UserService;
+
+import java.time.LocalDateTime;
 
 @Stateless
 public class UserSessionBean implements UserService {
@@ -83,11 +86,21 @@ public class UserSessionBean implements UserService {
 
     @Override
     public User findUserByUsernameOrEmail(String login) {
-        try{
-            return entityManager.createNamedQuery("User.findByUsernameOrEmail", User.class)
-                    .setParameter("login", login)
-                    .getSingleResult();
-        }catch (NoResultException e){
+//        try{
+//            return entityManager.createNamedQuery("User.findByUsernameOrEmail", User.class)
+//                    .setParameter("login", login)
+//                    .getSingleResult();
+//        }catch (NoResultException e){
+//            return null;
+//        }
+        try {
+            TypedQuery<User> query = entityManager.createNamedQuery("User.findByUsernameOrEmail", User.class);
+            query.setParameter("login", login);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } catch (Exception e) {
+            System.out.println("Error finding user by username or email: " + e.getMessage());
             return null;
         }
     }

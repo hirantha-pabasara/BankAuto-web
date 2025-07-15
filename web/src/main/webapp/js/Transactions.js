@@ -76,7 +76,7 @@ async function loadUserAccounts() {
         
         if (response.status === 401) {
             // User not authenticated, redirect to login
-            window.location.href = '../login.jsp';
+            window.location.href = '../user/login.jsp';
             return;
         }
         

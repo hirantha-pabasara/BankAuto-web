@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lk.jiat.bankauto.core.enums.UserRole;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Entity
 @NamedQueries({
@@ -11,6 +12,7 @@ import java.io.Serializable;
         @NamedQuery(name = "User.findAll", query = "select u from User u"),
         @NamedQuery(name = "User.findByUsernameOrEmail", query = "select u from User u where u.userName=:login OR u.email=:login"),
         @NamedQuery(name = "User.findByEmailAndPassword", query = "select u from User u where u.email=:email and u.password=:password"),
+        @NamedQuery(name = "User.findByVerificationCode", query = "SELECT u FROM User u WHERE u.verificationCode = :code AND u.verificationExpiry > :now")
 })
 public class User implements Serializable {
 
@@ -45,10 +47,30 @@ public class User implements Serializable {
     @Column(name = "nic", length = 12, nullable = true, unique = true)
     private String NIC;
 
-   @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private UserRole role = UserRole.USER;
 
+    // Verification fields (Version 2 edition)
+
+    @Column(name = "verification_code", length = 255)
+    private String verificationCode;
+
+    @Column(name = "is_verified", nullable = false)
+    private boolean isVerified = false;
+
+    @Column(name = "verification_expiry")
+    private LocalDateTime verificationExpiry;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     public User() {
+        // Version 2 edition constructor
+        this.createdAt = LocalDateTime.now();
     }
 
     public User(long id, String fname, String lname, String userName, String email, String password, String phoneNumber, String address, String DOB, String NIC) {
@@ -152,4 +174,52 @@ public class User implements Serializable {
     public void setRole(UserRole role) {
         this.role = role;
     }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean verified) {
+        isVerified = verified;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
+    public LocalDateTime getVerificationExpiry() {
+        return verificationExpiry;
+    }
+
+    public void setVerificationExpiry(LocalDateTime verificationExpiry) {
+        this.verificationExpiry = verificationExpiry;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    // Version 2 edition: Automatically set createdAt and updatedAt timestamps
+
+    @PrePersist
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
 }

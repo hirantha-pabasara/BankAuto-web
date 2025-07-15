@@ -417,6 +417,84 @@ body.sidebar-toggled .sidebar-brand-text {
     font-size: 0.9rem;
 }
 
+/* User Profile Section - Enhanced Right Alignment */
+.user-profile-display {
+    padding: 0.5rem 1rem;
+}
+
+.user-profile-display .d-flex {
+    min-width: 0; /* Allows flex items to shrink */
+}
+
+.user-info {
+    min-width: 180px; /* Ensures consistent width for text alignment */
+    flex-shrink: 0;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
+.user-status {
+    font-size: 0.75rem;
+    line-height: 1.1;
+    margin-bottom: 2px;
+}
+
+.user-last-login {
+    font-size: 0.7rem;
+    line-height: 1.1;
+}
+
+/* Avatar Enhanced Styling */
+.avatar-circle-enhanced {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    flex-shrink: 0;
+}
+
+.avatar-initials {
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.online-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    background-color: #28a745;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.logout-btn {
+    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    border-width: 1.5px;
+}
+
+.logout-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
 /* User Charts */
 .chart-container {
     position: relative;

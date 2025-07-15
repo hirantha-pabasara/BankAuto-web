@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - BankAuto</title>
+    <title>Email Verification - BankAuto</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/admin.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -19,48 +19,40 @@
                             <div class="col-lg-12">
                                 <div class="p-5">
                                     <div class="text-center">
-                                        <i class="fas fa-user-shield fa-3x text-primary mb-4"></i>
-                                        <h1 class="h4 text-gray-900 mb-4">Admin Login</h1>
-                                        <p class="text-muted">Please enter your credentials to access the admin dashboard</p>
+                                        <i class="fas fa-envelope-open fa-3x text-primary mb-4"></i>
+                                        <h1 class="h4 text-gray-900 mb-4">Email Verification</h1>
+                                        <p class="text-muted">Please enter the verification code sent to your email</p>
+                                        <div class="alert alert-info" role="alert">
+                                            <i class="fas fa-info-circle"></i> Check your email inbox for the verification code. It expires in 24 hours.
+                                        </div>
                                     </div>
                                     
-                                    <form id="loginForm" class="user">
+                                    <form id="verifyForm" class="user">
+                                        <input type="hidden" id="email" value="<%= request.getParameter("email") != null ? request.getParameter("email") : "" %>">
+                                        
                                         <div class="form-group mb-3">
-                                            <input type="email" class="form-control form-control-user" 
-                                                   id="email" placeholder="Email Address" required>
-                                        </div>
-                                        <div class="form-group mb-3">
-                                            <input type="password" class="form-control form-control-user" 
-                                                   id="password" placeholder="Password" required>
-                                        </div>
-                                        <div class="form-group mb-3">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="rememberMe">
-                                                <label class="custom-control-label" for="rememberMe">Remember Me</label>
-                                            </div>
+                                            <input type="text" class="form-control form-control-user" 
+                                                   id="verificationCode" placeholder="Enter Verification Code" required>
                                         </div>
                                         
                                         <div id="loadingSpinner" class="text-center" style="display: none;">
                                             <div class="spinner-border text-primary" role="status">
-                                                <span class="visually-hidden">Logging in...</span>
+                                                <span class="visually-hidden">Verifying...</span>
                                             </div>
+                                            <p class="mt-2">Verifying your email...</p>
                                         </div>
                                         
                                         <div id="messageContainer"></div>
                                         
-                                        <button type="submit" id="loginBtn" class="btn btn-primary btn-user btn-block w-100">
-                                            <i class="fas fa-sign-in-alt"></i> Login
+                                        <button type="submit" id="verifyBtn" class="btn btn-primary btn-user btn-block w-100">
+                                            <i class="fas fa-check"></i> Verify Email
                                         </button>
                                     </form>
                                     
                                     <hr>
                                     <div class="text-center">
                                         <a class="small" href="register.jsp">
-                                            <i class="fas fa-user-plus"></i> Create Admin Account
-                                        </a>
-                                        <br>
-                                        <a class="small" href="../index.jsp">
-                                            <i class="fas fa-arrow-left"></i> Back to Home
+                                            <i class="fas fa-arrow-left"></i> Back to Registration
                                         </a>
                                     </div>
                                 </div>

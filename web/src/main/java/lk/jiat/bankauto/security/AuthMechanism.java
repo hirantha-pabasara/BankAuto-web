@@ -24,7 +24,7 @@ public class AuthMechanism implements HttpAuthenticationMechanism {
     @Inject
     private IdentityStore identityStore;
 
-    // Define public paths that don't require authentication
+//     Define public paths that don't require authentication
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/",
             "/index.jsp",
@@ -34,6 +34,10 @@ public class AuthMechanism implements HttpAuthenticationMechanism {
             "/user/create-account.jsp",
             "/user/signup.jsp",
             "/user/login",
+            "/admin/login",
+            "/admin/login.jsp",
+            "/admin/register",
+            "/admin/verify",
             "/user/register",
             "/user/signup",
             "/user/create-account"
@@ -44,6 +48,7 @@ public class AuthMechanism implements HttpAuthenticationMechanism {
 
         // Handle explicit authentication requests (login attempts)
         AuthenticationParameters authParameters = context.getAuthParameters();
+
         if (authParameters.getCredential() != null) {
             CredentialValidationResult result = identityStore.validate(authParameters.getCredential());
             if (result.getStatus() == CredentialValidationResult.Status.VALID) {
@@ -53,12 +58,20 @@ public class AuthMechanism implements HttpAuthenticationMechanism {
             }
         }
 
-        // Get the request path
+        if(context.isProtected()){
+            try{
+                response.sendRedirect(request.getContextPath()+"/admin/login.jsp");
+            }catch (IOException e){
+                throw new RuntimeException("Redirect to login failed", e);
+            }
+        }
+
+//         //Get the request path
         String requestURI = request.getRequestURI();
         String contextPath = request.getContextPath();
         String path = requestURI.substring(contextPath.length());
-
-        // Allow access to static resources
+//
+//        // Allow access to static resources
         if (path.startsWith("/css/") ||
                 path.startsWith("/js/") ||
                 path.startsWith("/images/") ||
@@ -67,18 +80,18 @@ public class AuthMechanism implements HttpAuthenticationMechanism {
                 path.startsWith("/error/")) {
             return AuthenticationStatus.NOT_DONE;
         }
-
-        // Allow access to public pages
+//
+//        // Allow access to public pages
         if (PUBLIC_PATHS.contains(path)) {
             return AuthenticationStatus.NOT_DONE;
         }
-
-        // Check if user is already authenticated for protected resources
+//
+//        // Check if user is already authenticated for protected resources
         if (context.getCallerPrincipal() != null) {
             return AuthenticationStatus.SUCCESS;
         }
-
-        // Handle protected resources - redirect unauthenticated users to login
+//
+//        // Handle protected resources - redirect unauthenticated users to login
         if (context.isProtected()) {
             try {
                 // For AJAX requests, return 401
@@ -96,6 +109,7 @@ public class AuthMechanism implements HttpAuthenticationMechanism {
             }
         }
 
-        return AuthenticationStatus.NOT_DONE;
+//            return context.doNothing();
+       return AuthenticationStatus.NOT_DONE;
     }
 }

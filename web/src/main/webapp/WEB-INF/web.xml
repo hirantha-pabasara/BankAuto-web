@@ -53,7 +53,19 @@
         <welcome-file>index.jsp</welcome-file>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-    
+
+    <!-- Exclude login endpoints from security -->
+<!--    <security-constraint>-->
+<!--        <web-resource-collection>-->
+<!--            <web-resource-name>Public Login</web-resource-name>-->
+<!--            <url-pattern>/admin/login</url-pattern>-->
+<!--            <url-pattern>/admin/register</url-pattern>-->
+<!--            <url-pattern>/admin/verify</url-pattern>-->
+<!--            <url-pattern>/user/login</url-pattern>-->
+<!--            <url-pattern>/user/register</url-pattern>-->
+<!--        </web-resource-collection>-->
+<!--    </security-constraint>-->
+
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Public Resource</web-resource-name>
@@ -68,6 +80,12 @@
             <url-pattern>/user/register</url-pattern>
             <url-pattern>/user/signup</url-pattern>
             <url-pattern>/user/create-account</url-pattern>
+            <url-pattern>/admin/login.jsp</url-pattern>
+            <url-pattern>/admin/login</url-pattern>
+            <url-pattern>/admin/register.jsp</url-pattern>
+            <url-pattern>/admin/register</url-pattern>
+            <url-pattern>/admin/verify.jsp</url-pattern>
+            <url-pattern>/admin/verify</url-pattern>
             <url-pattern>/css/*</url-pattern>
             <url-pattern>/js/*</url-pattern>
             <url-pattern>/images/*</url-pattern>

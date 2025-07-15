@@ -38,7 +38,7 @@ class AccountDataLoader {
             if (!response.ok) {
                 if (response.status === 401) {
                     // Redirect to login if unauthorized
-                    window.location.href = '../login.jsp';
+                    window.location.href = '../user/login.jsp';
                     return;
                 }
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);

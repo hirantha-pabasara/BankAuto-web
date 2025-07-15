@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interest Rate Management Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .table th {
+            background-color: #343a40;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+        }
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .badge {
+            font-size: 0.9em;
+            padding: 6px 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Interest Rate Management Test</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5>Current Interest Rates</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Account Type</th>
+                                            <th>Current Rate (%)</th>
+                                            <th>New Rate (%)</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="interestRatesTableBody">
+                                        <!-- Interest rates will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-success" onclick="updateAllInterestRates()">
+                                        <i class="fas fa-save"></i> Update All Rates
+                                    </button>
+                                    <button type="button" class="btn btn-info" onclick="applyInterestToAll()">
+                                        <i class="fas fa-calculator"></i> Apply Interest to All Accounts
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="loadInterestRates()">
+                                        <i class="fas fa-sync-alt"></i> Refresh
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="statusMessage" class="alert mt-3" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Status message function
+        function showStatus(message, type) {
+            if (!type) type = 'success';
+            var statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+            statusDiv.innerHTML = 
+                message +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            statusDiv.style.display = 'block';
+            
+            setTimeout(function() {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Load interest rates from server
+        function loadInterestRates() {
+            fetch('interest-rates')
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch interest rates');
+                    }
+                    return response.json();
+                })
+                .then(function(result) {
+                    if (result.success) {
+                        displayInterestRatesTable(result.rates);
+                        showStatus('Interest rates loaded successfully', 'success');
+                    } else {
+                        throw new Error(result.message || 'Failed to load interest rates');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error loading interest rates:', error);
+                    showStatus('Failed to load interest rates: ' + error.message, 'danger');
+                    displayDefaultRatesTable();
+                });
+        }
+
+        // Display interest rates in table
+        function displayInterestRatesTable(rates) {
+            var tbody = document.getElementById('interestRatesTableBody');
+            tbody.innerHTML = '';
+            
+            for (var i = 0; i < rates.length; i++) {
+                var rate = rates[i];
+                var row = document.createElement('tr');
+                var accountTypeId = rate.accountType.replace(/\s+/g, '_');
+                
+                row.innerHTML = 
+                    '<td><strong>' + rate.displayName + '</strong></td>' +
+                    '<td><span class="badge bg-info">' + rate.currentRate + '%</span></td>' +
+                    '<td>' +
+                        '<input type="number" class="form-control" ' +
+                               'id="newRate_' + accountTypeId + '" ' +
+                               'step="0.01" min="0" max="15" ' +
+                               'placeholder="Enter new rate">' +
+                    '</td>' +
+                    '<td>' +
+                        '<button class="btn btn-sm btn-primary" ' +
+                                'onclick="updateSingleRate(\'' + rate.accountType + '\')">' +
+                            '<i class="fas fa-save"></i> Update' +
+                        '</button>' +
+                    '</td>';
+                tbody.appendChild(row);
+            }
+        }
+
+        // Display default rates table on error
+        function displayDefaultRatesTable() {
+            var defaultRates = [
+                { accountType: 'Savings Account', displayName: 'Savings', currentRate: '2.50' },
+                { accountType: 'Checking Account', displayName: 'Checking', currentRate: '0.50' },
+                { accountType: 'Current Account', displayName: 'Current', currentRate: '1.00' },
+                { accountType: 'Fixed Deposit', displayName: 'Fixed Deposit', currentRate: '5.00' }
+            ];
+            
+            displayInterestRatesTable(defaultRates);
+        }
+
+        // Update single interest rate
+        function updateSingleRate(accountType) {
+            var inputId = 'newRate_' + accountType.replace(/\s+/g, '_');
+            var newRateInput = document.getElementById(inputId);
+            var newRate = newRateInput.value.trim();
+            
+            if (!newRate) {
+                showStatus('Please enter a new rate to update', 'warning');
+                return;
+            }
+            
+            if (parseFloat(newRate) < 0 || parseFloat(newRate) > 15) {
+                showStatus('Interest rate must be between 0% and 15%', 'warning');
+                return;
+            }
+            
+            var params = new URLSearchParams();
+            params.append('action', 'updateRate');
+            params.append('accountType', accountType);
+            params.append('newRate', newRate);
+            
+            fetch('interest-rates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to update interest rate');
+                }
+                return response.json();
+            })
+            .then(function(result) {
+                if (result.success) {
+                    showStatus(result.message, 'success');
+                    loadInterestRates();
+                } else {
+                    showStatus(result.message || 'Failed to update interest rate', 'danger');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error updating single interest rate:', error);
+                showStatus('Failed to update interest rate', 'danger');
+            });
+        }
+
+        // Update all interest rates
+        function updateAllInterestRates() {
+            var tableBody = document.getElementById('interestRatesTableBody');
+            var rows = tableBody.getElementsByTagName('tr');
+            var params = new URLSearchParams();
+            params.append('action', 'updateAllRates');
+            
+            var hasRates = false;
+            
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var input = row.querySelector('input[type="number"]');
+                var accountType = getAccountTypeFromRow(row);
+                
+                if (input && input.value.trim() && accountType) {
+                    var rate = input.value.trim();
+                    
+                    if (parseFloat(rate) < 0 || parseFloat(rate) > 15) {
+                        showStatus('Interest rate for ' + accountType + ' must be between 0% and 15%', 'warning');
+                        return;
+                    }
+                    
+                    var paramName = getParamNameFromAccountType(accountType);
+                    params.append(paramName, rate);
+                    hasRates = true;
+                }
+            }
+            
+            if (!hasRates) {
+                showStatus('Please enter at least one interest rate to update', 'warning');
+                return;
+            }
+            
+            fetch('interest-rates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to update interest rates');
+                }
+                return response.json();
+            })
+            .then(function(result) {
+                if (result.success) {
+                    showStatus(result.message, 'success');
+                    loadInterestRates();
+                } else {
+                    showStatus(result.message || 'Failed to update interest rates', 'danger');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error updating all interest rates:', error);
+                showStatus('Failed to update interest rates', 'danger');
+            });
+        }
+
+        // Apply interest to all accounts
+        function applyInterestToAll() {
+            if (!confirm('Are you sure you want to apply interest to all accounts? This will add interest to all account balances based on current rates.')) {
+                return;
+            }
+            
+            var button = event.target;
+            var originalHTML = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying Interest...';
+            
+            var params = new URLSearchParams();
+            params.append('action', 'apply');
+            
+            fetch('../update-interest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to apply interest');
+                }
+                return response.json();
+            })
+            .then(function(result) {
+                if (result.success) {
+                    showStatus('Interest applied successfully to ' + result.accountsProcessed + ' accounts!', 'success');
+                } else {
+                    showStatus(result.message || 'Failed to apply interest', 'danger');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error applying interest:', error);
+                showStatus('Failed to apply interest to accounts', 'danger');
+            })
+            .finally(function() {
+                button.disabled = false;
+                button.innerHTML = originalHTML;
+            });
+        }
+
+        // Helper functions
+        function getAccountTypeFromRow(row) {
+            var firstCell = row.getElementsByTagName('td')[0];
+            if (firstCell) {
+                var text = firstCell.textContent.trim();
+                switch (text) {
+                    case 'Savings': return 'Savings Account';
+                    case 'Checking': return 'Checking Account';
+                    case 'Current': return 'Current Account';
+                    case 'Fixed Deposit': return 'Fixed Deposit';
+                    default: return text;
+                }
+            }
+            return null;
+        }
+
+        function getParamNameFromAccountType(accountType) {
+            switch (accountType) {
+                case 'Savings Account': return 'savings';
+                case 'Checking Account': return 'checking';
+                case 'Current Account': return 'current';
+                case 'Fixed Deposit': return 'fixed';
+                default: return accountType.toLowerCase().replace(/\s+/g, '');
+            }
+        }
+
+        // Load rates when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInterestRates();
+        });
+    </script>
+</body>
+</html>
