@@ -55,7 +55,7 @@
             <hr class="sidebar-divider">
             
             <li class="nav-item">
-                <a class="nav-link" href="../logout.jsp">
+                <a class="nav-link" href="javascript:void(0)" onclick="performLogout()">
                     <i class="fas fa-fw fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -78,7 +78,7 @@
                                 <i class="fas fa-user-circle fa-fw"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
-                                <a class="dropdown-item" href="../logout.jsp">
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="performLogout()">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>
@@ -254,6 +254,33 @@
             alert('Account ' + currentAccountId + ' has been rejected. Reason: ' + reason);
             bootstrap.Modal.getInstance(document.getElementById('rejectModal')).hide();
             location.reload();
+        }
+
+        // Logout function for admin
+        function performLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Show loading indicator
+                const logoutBtns = document.querySelectorAll('a[onclick="performLogout()"]');
+                logoutBtns.forEach(btn => {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Logging out...</span>';
+                    btn.style.pointerEvents = 'none';
+                });
+
+                // Create a form and submit it to the servlet with admin parameter
+                const form = document.createElement('form');
+                form.method = 'GET';
+                form.action = '../user/logout';
+                
+                // Add a parameter to indicate this is an admin logout
+                const adminParam = document.createElement('input');
+                adminParam.type = 'hidden';
+                adminParam.name = 'admin';
+                adminParam.value = 'true';
+                form.appendChild(adminParam);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
         }
     </script>
 </body>

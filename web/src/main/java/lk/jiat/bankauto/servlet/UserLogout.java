@@ -17,7 +17,19 @@ public class UserLogout extends HttpServlet {
         if (session != null) {
             session.invalidate();
         }
-        System.out.println("Removed user session and logged out successfully.");
-        response.sendRedirect(request.getContextPath() + "/user/login.jsp");
+        
+        // Check if this is an admin logout
+        String isAdmin = request.getParameter("admin");
+        String redirectPath;
+        
+        if ("true".equals(isAdmin)) {
+            System.out.println("Admin logged out successfully.");
+            redirectPath = request.getContextPath() + "/admin/login.jsp";
+        } else {
+            System.out.println("User logged out successfully.");
+            redirectPath = request.getContextPath() + "/user/login.jsp";
+        }
+        
+        response.sendRedirect(redirectPath);
     }
 }

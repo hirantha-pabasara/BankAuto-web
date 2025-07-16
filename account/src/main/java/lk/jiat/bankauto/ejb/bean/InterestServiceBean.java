@@ -6,8 +6,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import lk.jiat.bankauto.core.enums.AccountStatus;
+import lk.jiat.bankauto.core.enums.TransactionStatus;
+import lk.jiat.bankauto.core.enums.TransactionType;
+import lk.jiat.bankauto.core.enums.TransferType;
 import lk.jiat.bankauto.core.model.BankAccount;
 import lk.jiat.bankauto.core.model.InterestRate;
+import lk.jiat.bankauto.core.model.Transaction;
 import lk.jiat.bankauto.core.service.AccountService;
 import lk.jiat.bankauto.core.service.InterestService;
 
@@ -163,12 +167,77 @@ public class InterestServiceBean implements InterestService {
             .setScale(2, RoundingMode.HALF_UP);
         
         // Add interest to account balance
-        BigDecimal newBalance = account.getBalance().add(interestAmount);
+        BigDecimal oldBalance = account.getBalance();
+        BigDecimal newBalance = oldBalance.add(interestAmount);
         account.setBalance(newBalance);
         
         em.merge(account);
         
+        // Create transaction record for interest credit
+        createInterestTransaction(account, interestAmount, oldBalance, newBalance, interestRate);
+        
+        logger.info("Applied interest of $" + interestAmount + " to account " + account.getAccountNumber() + 
+                   " (Rate: " + interestRate + "%, Balance: $" + oldBalance + " -> $" + newBalance + ")");
+        
         return interestAmount;
+    }
+    
+    /**
+     * Creates a transaction record for the interest credit
+     * @param account The account that received interest
+     * @param interestAmount The amount of interest applied
+     * @param oldBalance The account balance before interest
+     * @param newBalance The account balance after interest
+     * @param interestRate The annual interest rate used
+     */
+    private void createInterestTransaction(BankAccount account, BigDecimal interestAmount, 
+                                         BigDecimal oldBalance, BigDecimal newBalance, BigDecimal interestRate) {
+        try {
+            // Create transaction record for transparency
+            Transaction interestTransaction = new Transaction();
+            
+            // Set basic transaction information
+            // For interest transactions, use the account ID as both from and to (self-credit)
+            interestTransaction.setFromAccountId(account.getId());
+            interestTransaction.setToAccountId(account.getId());
+            interestTransaction.setToAccountIdentifier(account.getAccountNumber());
+            interestTransaction.setAmount(interestAmount);
+            interestTransaction.setTransactionType(TransactionType.INTEREST);
+            interestTransaction.setTransferType(TransferType.IMMEDIATE);
+            interestTransaction.setStatus(TransactionStatus.COMPLETED);
+            
+            // Set description with details
+            String description = String.format("Monthly Interest Credit - %.2f%% APR on %s Account", 
+                                              interestRate, account.getAccountType());
+            interestTransaction.setDescription(description);
+            
+            // Set timing information
+            LocalDateTime now = LocalDateTime.now();
+            interestTransaction.setTransactionDate(now);
+            interestTransaction.setProcessedDate(now);
+            interestTransaction.setCreatedBy(1L); // System user ID
+            interestTransaction.setProcessedBy(1L); // System user ID
+            
+            // Set balance information
+            interestTransaction.setBalanceAfterTransaction(newBalance);
+            
+            // Generate reference number for interest transactions
+            String referenceNumber = "INT" + System.currentTimeMillis() + String.format("%04d", (int)(Math.random() * 10000));
+            interestTransaction.setReferenceNumber(referenceNumber);
+            
+            // Persist the transaction
+            em.persist(interestTransaction);
+            
+            logger.info("Created interest transaction record: " + referenceNumber + 
+                       " for account " + account.getAccountNumber() + " amount $" + interestAmount);
+            
+        } catch (Exception e) {
+            logger.warning("Failed to create interest transaction record for account " + 
+                          account.getAccountNumber() + ": " + e.getMessage());
+            e.printStackTrace(); // Add stack trace for debugging
+            // Don't throw exception as interest was already applied to account
+            // This ensures interest calculation continues even if transaction logging fails
+        }
     }
 
     @Override

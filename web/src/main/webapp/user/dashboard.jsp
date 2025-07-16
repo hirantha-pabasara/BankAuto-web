@@ -8,6 +8,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/user.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .transfer-status-pending { color: #ffc107; }
+        .transfer-status-completed { color: #198754; }
+        .transfer-status-failed { color: #dc3545; }
+        .transfer-status-scheduled { color: #0dcaf0; }
+    </style>
 </head>
 <body id="page-top">
     <div id="wrapper">
@@ -62,7 +68,7 @@
             <hr class="sidebar-divider">
             
             <li class="nav-item">
-                <a class="nav-link" href="../logout.jsp">
+                <a class="nav-link" href="javascript:void(0)" onclick="performLogout()">
                     <i class="fas fa-fw fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -193,16 +199,8 @@
                             <div class="nav-link user-profile-display">
                                 <div class="d-flex align-items-center justify-content-end">
                                     <div class="mr-3 d-none d-lg-block text-right user-info">
-                                        <span class="text-gray-800 font-weight-bold d-block user-name">
-                                            <%
-                                                // Get user full name from session
-                                                String userFullName = (String) session.getAttribute("userFullName");
-                                                if (userFullName != null && !userFullName.trim().isEmpty()) {
-                                                    out.print(userFullName);
-                                                } else {
-                                                    out.print("Guest User");
-                                                }
-                                            %>
+                                        <span class="text-gray-800 font-weight-bold d-block user-name" id="userDisplayName">
+                                            User
                                         </span>
                                         <div class="small text-primary font-weight-medium user-status">Premium Customer</div>
                                         <div class="small text-muted user-last-login">
@@ -210,27 +208,15 @@
                                         </div>
                                     </div>
                                     <div class="avatar-circle-enhanced">
-                                        <%
-                                            // Get user initials for avatar
-                                            String initials = "GU";
-                                            if (userFullName != null && !userFullName.trim().isEmpty()) {
-                                                String[] names = userFullName.split(" ");
-                                                if (names.length >= 2) {
-                                                    initials = names[0].substring(0, 1).toUpperCase() + names[names.length - 1].substring(0, 1).toUpperCase();
-                                                } else if (names.length == 1) {
-                                                    initials = names[0].substring(0, Math.min(2, names[0].length())).toUpperCase();
-                                                }
-                                            }
-                                        %>
-                                        <span class="avatar-initials"><%= initials %></span>
+                                        <span class="avatar-initials" id="userInitials">U</span>
                                         <div class="online-indicator"></div>
                                     </div>
                                     <div class="ml-3">
                                         <!-- <a href="../logout.jsp" class="btn btn-outline-danger btn-sm logout-btn"> -->
-                                            <a href="../user/logout" class="btn btn-outline-danger btn-sm logout-btn">
+                                            <button onclick="performLogout()" class="btn btn-outline-danger btn-sm logout-btn">
                                             <i class="fas fa-sign-out-alt fa-sm"></i>
                                             <span class="d-none d-md-inline ml-1">Logout</span>
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -337,47 +323,47 @@
                         <!-- Recent Transactions -->
                         <div class="col-lg-8 mb-4">
                             <div class="card shadow mb-4">
-                                <div class="card-header py-3">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
                                     <h6 class="m-0 font-weight-bold text-primary">Recent Transactions</h6>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadRecentTransactions()">
+                                            <i class="fas fa-sync-alt"></i> Refresh
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-success" onclick="filterInterestTransactions()">
+                                            <i class="fas fa-filter"></i> Interest Only
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-info" onclick="viewAllTransactions()">
+                                            <i class="fas fa-list"></i> View All
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="card-body">
+                                    <div id="transactionsLoadingSpinner" class="text-center" style="display: none;">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading transactions...</p>
+                                    </div>
                                     <div class="table-responsive">
                                         <table class="table table-bordered" width="100%" cellspacing="0">
                                             <thead>
                                                 <tr>
                                                     <th>Date</th>
+                                                    <th>Type</th>
                                                     <th>Description</th>
                                                     <th>Amount</th>
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody id="recentTransactionsTableBody">
                                                 <tr>
-                                                    <td>2025-01-15</td>
-                                                    <td>Transfer to John Smith</td>
-                                                    <td class="text-danger">-$500.00</td>
-                                                    <td><span class="badge bg-success">Completed</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2025-01-14</td>
-                                                    <td>Salary Deposit</td>
-                                                    <td class="text-success">+$3,500.00</td>
-                                                    <td><span class="badge bg-success">Completed</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2025-01-13</td>
-                                                    <td>Online Purchase</td>
-                                                    <td class="text-danger">-$125.50</td>
-                                                    <td><span class="badge bg-success">Completed</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2025-01-12</td>
-                                                    <td>ATM Withdrawal</td>
-                                                    <td class="text-danger">-$200.00</td>
-                                                    <td><span class="badge bg-warning">Pending</span></td>
+                                                    <td colspan="5" class="text-center">Loading transactions...</td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <small class="text-muted">Showing last 10 transactions. <a href="transactions.jsp">View all transactions</a></small>
                                     </div>
                                 </div>
                             </div>
@@ -392,9 +378,9 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12 mb-3">
-                                            <button class="btn btn-primary btn-block w-100" onclick="quickTransfer()">
-                                                <i class="fas fa-paper-plane"></i> Quick Transfer
-                                            </button>
+                                            <a href="transactions.jsp" class="btn btn-primary btn-block w-100">
+                                                <i class="fas fa-paper-plane"></i> New Transfer
+                                            </a>
                                         </div>
                                         <div class="col-12 mb-3">
                                             <a href="createAccount.jsp" class="btn btn-success btn-block w-100">
@@ -448,40 +434,18 @@
         </div>
     </div>
     
-    <!-- Quick Transfer Modal -->
-    <div class="modal fade" id="quickTransferModal" tabindex="-1" aria-labelledby="quickTransferModalLabel" aria-hidden="true">
+    <!-- Transaction Details Modal -->
+    <div class="modal fade" id="transactionDetailsModal" tabindex="-1" aria-labelledby="transactionDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="quickTransferModalLabel">Quick Transfer</h5>
+                    <h5 class="modal-title" id="transactionDetailsModalLabel">
+                        <i class="fas fa-info-circle"></i> Transaction Details
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group mb-3">
-                            <label for="fromAccount">From Account:</label>
-                            <select class="form-control" id="fromAccount">
-                                <option>Checking - $2,842.50</option>
-                                <option>Savings - $12,500.00</option>
-                            </select>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="toAccount">To Account/Email:</label>
-                            <input type="text" class="form-control" id="toAccount" placeholder="Enter account number or email">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="amount">Amount:</label>
-                            <input type="number" class="form-control" id="amount" placeholder="0.00" step="0.01">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="description">Description:</label>
-                            <input type="text" class="form-control" id="description" placeholder="Optional description">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="processTransfer()">Transfer</button>
+                <div class="modal-body" id="transactionDetailsContent">
+                    <!-- Populated dynamically -->
                 </div>
             </div>
         </div>
@@ -900,69 +864,6 @@
             }
         });
         
-        function quickTransfer() {
-            new bootstrap.Modal(document.getElementById('quickTransferModal')).show();
-        }
-        
-        function processTransfer() {
-            const button = document.getElementById('transferButton') || event.target;
-            const originalText = button.textContent;
-            
-            // Prevent multiple submissions
-            if (button.disabled) return;
-            
-            // Set loading state
-            button.disabled = true;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-            
-            try {
-                // Basic validation
-                const fromAccount = document.getElementById('fromAccount')?.value;
-                const toAccount = document.getElementById('toAccount')?.value;
-                const amount = document.getElementById('amount')?.value;
-                
-                if (!fromAccount || !toAccount || !amount) {
-                    throw new Error('Please fill in all required fields');
-                }
-                
-                if (parseFloat(amount) <= 0) {
-                    throw new Error('Please enter a valid amount');
-                }
-                
-                // Simulate transfer processing
-                setTimeout(() => {
-                    try {
-                        // TODO: Replace with actual backend integration
-                        alert('Transfer initiated successfully!');
-                        bootstrap.Modal.getInstance(document.getElementById('quickTransferModal')).hide();
-                        
-                        // Reset form
-                        document.getElementById('quickTransferModal').querySelector('form').reset();
-                        
-                        // Refresh page data
-                        if (typeof refreshPageContent === 'function') {
-                            refreshPageContent();
-                        } else {
-                            // Fallback: reload page after short delay
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000);
-                        }
-                        
-                    } finally {
-                        // Reset button state
-                        button.disabled = false;
-                        button.textContent = originalText;
-                    }
-                }, 1500); // Simulate processing time
-                
-            } catch (error) {
-                alert('Error: ' + error.message);
-                button.disabled = false;
-                button.textContent = originalText;
-            }
-        }
-        
         function payBills() {
             // TODO: Implement bill payment
             alert('Bill payment feature coming soon!');
@@ -971,6 +872,255 @@
         function requestCard() {
             // TODO: Implement card request
             alert('Card request submitted successfully!');
+        }
+        
+        // Transaction management functions
+        async function loadRecentTransactions() {
+            showTransactionsLoading(true);
+            
+            try {
+                const response = await fetch('../api/transfers/history', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                
+                const data = await response.json();
+                const transactions = data.transactions || [];
+                const tableBody = document.getElementById('recentTransactionsTableBody');
+                
+                // Clear existing table rows
+                tableBody.innerHTML = '';
+                
+                // Populate table with transaction data
+                transactions.forEach(transaction => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = 
+                        '<td>' + new Date(transaction.date).toLocaleString() + '</td>' +
+                        '<td>' + transaction.type + '</td>' +
+                        '<td>' + transaction.description + '</td>' +
+                        '<td>$' + transaction.amount.toFixed(2) + '</td>' +
+                        '<td class="transfer-status-' + transaction.status.toLowerCase() + '">' + transaction.status + '</td>';
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                const tableBody = document.getElementById('recentTransactionsTableBody');
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading transactions. Please try again later.</td></tr>';
+            } finally {
+                showTransactionsLoading(false);
+            }
+        }
+        
+        function showTransactionsLoading(isLoading) {
+            const spinner = document.getElementById('transactionsLoadingSpinner');
+            const tableContainer = document.querySelector('.table-responsive');
+            
+            if (isLoading) {
+                spinner.style.display = 'block';
+                if (tableContainer) {
+                    tableContainer.style.display = 'none';
+                }
+            } else {
+                spinner.style.display = 'none';
+                if (tableContainer) {
+                    tableContainer.style.display = 'block';
+                }
+            }
+        }
+        
+        // Initialize dashboard data
+        async function initDashboard() {
+            try {
+                // Load recent transactions
+                await loadRecentTransactions();
+                
+                // Load account balances and other data
+                // ...
+            } catch (error) {
+                console.error('Error initializing dashboard:', error);
+            }
+        }
+        
+        // Call initDashboard on page load
+        document.addEventListener('DOMContentLoaded', initDashboard);
+        
+        // Logout function
+        function performLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    // Clear any local storage
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userSession');
+                    
+                    // Redirect to logout page
+                    window.location.href = '../logout.jsp';
+                } catch (error) {
+                    console.error('Error during logout:', error);
+                    // Fallback: just redirect to logout page
+                    window.location.href = '../logout.jsp';
+                }
+            }
+        }
+        
+        // View transaction details in modal
+        function viewTransactionDetails(transactionId) {
+            // TODO: Load and display transaction details
+            const transactionDetailsContent = document.getElementById('transactionDetailsContent');
+            transactionDetailsContent.innerHTML = '<p>Loading transaction details...</p>';
+            
+            // Simulate loading delay
+            setTimeout(() => {
+                transactionDetailsContent.innerHTML = 
+                    '<h5>Transaction ID: ' + transactionId + '</h5>' +
+                    '<div class="mb-3">' +
+                        '<strong>Date:</strong> ' + new Date().toLocaleString() +
+                    '</div>' +
+                    '<div class="mb-3">' +
+                        '<strong>Type:</strong> Transfer' +
+                    '</div>' +
+                    '<div class="mb-3">' +
+                        '<strong>Status:</strong> Completed' +
+                    '</div>' +
+                    '<div class="mb-3">' +
+                        '<strong>Amount:</strong> $100.00' +
+                    '</div>' +
+                    '<div class="mb-3">' +
+                        '<strong>From:</strong> ACC1234567890' +
+                    '</div>' +
+                    '<div class="mb-3">' +
+                        '<strong>To:</strong> ACC0987654321' +
+                    '</div>' +
+                    '<div class="mb-3">' +
+                        '<strong>Description:</strong> Payment for invoice #1234' +
+                    '</div>';
+            }, 1000);
+        }
+        
+        // Load transactions when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load recent transactions after other DOM content is loaded
+            setTimeout(loadRecentTransactions, 1000);
+            
+            // Load user information
+            loadUserInformation();
+        });
+        
+        // Load user information from session/backend
+        async function loadUserInformation() {
+            try {
+                const response = await fetch('account-details', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0 && data[0].accountHolder) {
+                        const fullName = data[0].accountHolder;
+                        updateUserDisplay(fullName);
+                    }
+                }
+            } catch (error) {
+                console.log('Could not load user information:', error);
+                // Keep default values
+            }
+        }
+        
+        // Update user display elements
+        function updateUserDisplay(fullName) {
+            // Update display name
+            const userDisplayName = document.getElementById('userDisplayName');
+            if (userDisplayName) {
+                userDisplayName.textContent = fullName;
+            }
+            
+            // Update initials
+            const userInitials = document.getElementById('userInitials');
+            if (userInitials && fullName) {
+                const names = fullName.split(' ');
+                let initials = 'U';
+                if (names.length >= 2) {
+                    initials = names[0].substring(0, 1).toUpperCase() + names[names.length - 1].substring(0, 1).toUpperCase();
+                } else if (names.length === 1) {
+                    initials = names[0].substring(0, Math.min(2, names[0].length())).toUpperCase();
+                }
+                userInitials.textContent = initials;
+            }
+        }
+
+        // Additional helper functions
+        async function filterInterestTransactions() {
+            showTransactionsLoading(true);
+            
+            try {
+                const response = await fetch('../api/interest/transactions', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load interest transactions');
+                }
+                
+                const transactions = await response.json();
+                displayTransactions(transactions, true);
+                
+            } catch (error) {
+                console.error('Error loading interest transactions:', error);
+                displayTransactionsError('Failed to load interest transactions: ' + error.message);
+            } finally {
+                showTransactionsLoading(false);
+            }
+        }
+        
+        function viewAllTransactions() {
+            // Redirect to the transactions page
+            window.location.href = 'transactions.jsp';
+        }
+        
+        function displayTransactions(transactions, isInterestOnly) {
+            const tableBody = document.getElementById('recentTransactionsTableBody');
+            
+            if (!transactions || transactions.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No transactions found</td></tr>';
+                return;
+            }
+            
+            // Sort by date (newest first) and take only the first 10
+            const sortedTransactions = transactions
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 10);
+            
+            tableBody.innerHTML = '';
+            sortedTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = 
+                    '<td>' + new Date(transaction.date).toLocaleString() + '</td>' +
+                    '<td>' + transaction.type + '</td>' +
+                    '<td>' + transaction.description + '</td>' +
+                    '<td>$' + transaction.amount.toFixed(2) + '</td>' +
+                    '<td class="transfer-status-' + transaction.status.toLowerCase() + '">' + transaction.status + '</td>';
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function displayTransactionsError(errorMessage) {
+            const tableBody = document.getElementById('recentTransactionsTableBody');
+            tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">' + errorMessage + '</td></tr>';
         }
     </script>
 </body>

@@ -175,7 +175,7 @@
             <hr class="sidebar-divider">
             
             <li class="nav-item">
-                <a class="nav-link" href="../logout.jsp">
+                <a class="nav-link" href="javascript:void(0)" onclick="performLogout()">
                     <i class="fas fa-fw fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -198,7 +198,7 @@
                                 <i class="fas fa-user-circle fa-fw"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
-                                <a class="dropdown-item" href="../logout.jsp">
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="performLogout()">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>
@@ -343,6 +343,11 @@
                                                 <i class="fas fa-calculator"></i> Apply Interest to All Accounts
                                             </button>
                                         </div>
+                                        <div class="col-md-12 mb-3">
+                                            <button class="btn btn-primary btn-block w-100" onclick="viewInterestTransactions()">
+                                                <i class="fas fa-chart-line"></i> Interest Transactions Report
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -454,6 +459,33 @@
             setTimeout(function() {
                 statusDiv.style.display = 'none';
             }, 5000);
+        }
+
+        // Logout function for admin
+        function performLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Show loading indicator
+                const logoutBtns = document.querySelectorAll('a[onclick="performLogout()"]');
+                logoutBtns.forEach(btn => {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Logging out...</span>';
+                    btn.style.pointerEvents = 'none';
+                });
+
+                // Create a form and submit it to the servlet with admin parameter
+                const form = document.createElement('form');
+                form.method = 'GET';
+                form.action = '../user/logout';
+                
+                // Add a parameter to indicate this is an admin logout
+                const adminParam = document.createElement('input');
+                adminParam.type = 'hidden';
+                adminParam.name = 'admin';
+                adminParam.value = 'true';
+                form.appendChild(adminParam);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
         }
         
         async function loadPendingAccounts() {
@@ -775,6 +807,295 @@
             // Any initialization code can go here
             console.log('Admin Dashboard loaded');
         });
+        
+        async function viewInterestTransactions() {
+            try {
+                // Show loading indicator
+                showStatus('Loading interest transactions report...', 'info');
+                
+                // Get interest summary first
+                const summaryResponse = await fetch('../api/interest/summary', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!summaryResponse.ok) {
+                    throw new Error('Failed to fetch interest summary');
+                }
+                
+                const summary = await summaryResponse.json();
+                
+                // Get recent interest transactions
+                const transactionsResponse = await fetch('../api/interest/transactions', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!transactionsResponse.ok) {
+                    throw new Error('Failed to fetch interest transactions');
+                }
+                
+                const transactionsData = await transactionsResponse.json();
+                
+                // Display the report in a modal or new section
+                displayInterestReport(summary, transactionsData);
+                
+            } catch (error) {
+                console.error('Error fetching interest transactions:', error);
+                showStatus('Failed to load interest transactions report. Error: ' + error.message, 'danger');
+            }
+        }
+        
+        function displayInterestReport(summary, transactionsData) {
+            // Create modal content for interest report
+            const modalHtml = 
+                '<div class="modal fade" id="interestReportModal" tabindex="-1" aria-labelledby="interestReportModalLabel" aria-hidden="true">' +
+                    '<div class="modal-dialog modal-xl">' +
+                        '<div class="modal-content">' +
+                            '<div class="modal-header">' +
+                                '<h5 class="modal-title" id="interestReportModalLabel">' +
+                                    '<i class="fas fa-chart-line"></i> Interest Transactions Report' +
+                                '</h5>' +
+                                '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                            '</div>' +
+                            '<div class="modal-body">' +
+                                '<!-- Interest Summary Cards -->' +
+                                '<div class="row mb-4">' +
+                                    '<div class="col-md-3">' +
+                                        '<div class="card bg-success text-white">' +
+                                            '<div class="card-body">' +
+                                                '<div class="d-flex align-items-center">' +
+                                                    '<div>' +
+                                                        '<div class="h5 mb-0">$' + (summary.totalInterestEarned || '0.00') + '</div>' +
+                                                        '<div class="small">Total Interest Paid</div>' +
+                                                    '</div>' +
+                                                    '<div class="ms-auto">' +
+                                                        '<i class="fas fa-dollar-sign fa-2x"></i>' +
+                                                    '</div>' +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>' +
+                                    '<div class="col-md-3">' +
+                                        '<div class="card bg-primary text-white">' +
+                                            '<div class="card-body">' +
+                                                '<div class="d-flex align-items-center">' +
+                                                    '<div>' +
+                                                        '<div class="h5 mb-0">' + (summary.totalPayments || '0') + '</div>' +
+                                                        '<div class="small">Total Payments</div>' +
+                                                    '</div>' +
+                                                    '<div class="ms-auto">' +
+                                                        '<i class="fas fa-list fa-2x"></i>' +
+                                                    '</div>' +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>' +
+                                    '<div class="col-md-3">' +
+                                        '<div class="card bg-info text-white">' +
+                                            '<div class="card-body">' +
+                                                '<div class="d-flex align-items-center">' +
+                                                    '<div>' +
+                                                        '<div class="h5 mb-0">$' + (summary.currentMonthInterest || '0.00') + '</div>' +
+                                                        '<div class="small">This Month</div>' +
+                                                    '</div>' +
+                                                    '<div class="ms-auto">' +
+                                                        '<i class="fas fa-calendar fa-2x"></i>' +
+                                                    '</div>' +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>' +
+                                    '<div class="col-md-3">' +
+                                        '<div class="card bg-warning text-white">' +
+                                            '<div class="card-body">' +
+                                                '<div class="d-flex align-items-center">' +
+                                                    '<div>' +
+                                                        '<div class="h5 mb-0">' + (summary.periodStart || 'N/A') + '</div>' +
+                                                        '<div class="small">Report Period Start</div>' +
+                                                    '</div>' +
+                                                    '<div class="ms-auto">' +
+                                                        '<i class="fas fa-calendar-alt fa-2x"></i>' +
+                                                    '</div>' +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                                
+                                '<!-- Recent Interest Transactions Table -->' +
+                                '<div class="card">' +
+                                    '<div class="card-header">' +
+                                        '<h6 class="m-0 font-weight-bold">Recent Interest Transactions</h6>' +
+                                    '</div>' +
+                                    '<div class="card-body">' +
+                                        '<div class="table-responsive">' +
+                                            '<table class="table table-striped">' +
+                                                '<thead>' +
+                                                    '<tr>' +
+                                                        '<th>Date</th>' +
+                                                        '<th>Account</th>' +
+                                                        '<th>Amount</th>' +
+                                                        '<th>Description</th>' +
+                                                        '<th>Reference</th>' +
+                                                        '<th>Balance After</th>' +
+                                                    '</tr>' +
+                                                '</thead>' +
+                                                '<tbody id="interestTransactionsTableBody">' +
+                                                    generateInterestTransactionsRows(transactionsData.transactions || []) +
+                                                '</tbody>' +
+                                            '</table>' +
+                                        '</div>' +
+                                        (transactionsData.totalCount > 5 ? 
+                                            '<div class="mt-3 text-center">' +
+                                                '<button class="btn btn-outline-primary" onclick="loadAllInterestTransactions()">' +
+                                                    'View All ' + transactionsData.totalCount + ' Transactions' +
+                                                '</button>' +
+                                            '</div>' : '') +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="modal-footer">' +
+                                '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>' +
+                                '<button type="button" class="btn btn-primary" onclick="exportInterestReport()">' +
+                                    '<i class="fas fa-download"></i> Export Report' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            
+            // Remove existing modal if present
+            const existingModal = document.getElementById('interestReportModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to DOM
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('interestReportModal'));
+            modal.show();
+            
+            showStatus('Interest transactions report loaded successfully!', 'success');
+        }
+        
+        function generateInterestTransactionsRows(transactions) {
+            if (!transactions || transactions.length === 0) {
+                return '<tr><td colspan="6" class="text-center">No interest transactions found</td></tr>';
+            }
+            
+            return transactions.slice(0, 10).map(transaction => {
+                const date = new Date(transaction.transactionDate).toLocaleDateString();
+                const amount = parseFloat(transaction.amount).toFixed(2);
+                const balanceAfter = transaction.balanceAfterTransaction ? 
+                    parseFloat(transaction.balanceAfterTransaction).toFixed(2) : 'N/A';
+                
+                return '<tr>' +
+                        '<td>' + date + '</td>' +
+                        '<td>' + (transaction.toAccountIdentifier || 'N/A') + '</td>' +
+                        '<td class="text-success">+$' + amount + '</td>' +
+                        '<td>' + (transaction.description || 'Interest Credit') + '</td>' +
+                        '<td><small>' + transaction.referenceNumber + '</small></td>' +
+                        '<td>$' + balanceAfter + '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+        
+        async function loadAllInterestTransactions() {
+            // Close current modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('interestReportModal'));
+            modal.hide();
+            
+            // Show full report - redirect to transactions page with filter
+            showStatus('Loading complete interest transactions...', 'info');
+            
+            // For now, we'll show another modal with all transactions
+            // In a real application, you might redirect to a dedicated reports page
+            try {
+                const response = await fetch('../api/interest/transactions?limit=100', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch all interest transactions');
+                }
+                
+                const data = await response.json();
+                displayAllInterestTransactions(data);
+                
+            } catch (error) {
+                console.error('Error loading all interest transactions:', error);
+                showStatus('Failed to load complete interest transactions. Error: ' + error.message, 'danger');
+            }
+        }
+        
+        function displayAllInterestTransactions(transactionsData) {
+            const modalHtml = 
+                '<div class="modal fade" id="allInterestTransactionsModal" tabindex="-1" aria-hidden="true">' +
+                    '<div class="modal-dialog modal-xl">' +
+                        '<div class="modal-content">' +
+                            '<div class="modal-header">' +
+                                '<h5 class="modal-title">' +
+                                    '<i class="fas fa-list"></i> All Interest Transactions (' + (transactionsData.totalCount || 0) + ')' +
+                                '</h5>' +
+                                '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                            '</div>' +
+                            '<div class="modal-body">' +
+                                '<div class="table-responsive" style="max-height: 500px;">' +
+                                    '<table class="table table-striped table-sm">' +
+                                        '<thead class="table-dark sticky-top">' +
+                                            '<tr>' +
+                                                '<th>Date</th>' +
+                                                '<th>Account</th>' +
+                                                '<th>Amount</th>' +
+                                                '<th>Description</th>' +
+                                                '<th>Reference</th>' +
+                                                '<th>Balance After</th>' +
+                                            '</tr>' +
+                                        '</thead>' +
+                                        '<tbody>' +
+                                            generateInterestTransactionsRows(transactionsData.transactions || []) +
+                                        '</tbody>' +
+                                    '</table>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="modal-footer">' +
+                                '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>' +
+                                '<button type="button" class="btn btn-primary" onclick="exportInterestReport()">' +
+                                    '<i class="fas fa-download"></i> Export CSV' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            
+            // Remove existing modal if present
+            const existingModal = document.getElementById('allInterestTransactionsModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to DOM
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('allInterestTransactionsModal'));
+            modal.show();
+        }
+        
+        function exportInterestReport() {
+            showStatus('Export functionality would be implemented here', 'info');
+            // TODO: Implement CSV/PDF export functionality
+        }
     </script>
 </body>
 </html>
