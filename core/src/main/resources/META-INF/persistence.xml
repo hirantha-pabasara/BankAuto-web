@@ -6,6 +6,7 @@
         <class>lk.jiat.bankauto.core.model.Transaction</class>
         <shared-cache-mode>NONE</shared-cache-mode>
         <properties>
+
 <!--            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>-->
 <!--            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>-->
 <!--            <property name="eclipselink.ddl-generation.output-mode" value="database"/>-->
@@ -22,5 +23,6 @@
             <property name="eclipselink.cache.shared.default" value="false"/>
 
         </properties>
+
     </persistence-unit>
 </persistence>

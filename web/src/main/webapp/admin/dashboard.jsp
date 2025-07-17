@@ -3,87 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-                                            <button class="btn btn-info btn-block w-100" onclick="applyInterestToAll()">
-                                                <i class="fas fa-calculator"></i> Apply Interest to All Accounts
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Pending Accounts Management -->
-                        <div class="col-lg-6 mb-4">
-                            <div class="card shadow mb-4" id="pendingAccountsCard" style="display: none;">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Pending Account Approvals</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div id="pendingAccountsList">
-                                        <!-- Pending accounts will be loaded here -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Interest Rate Management Section -->
-                    <div class="row" id="interestManagementSection" style="display: none;">
-                        <div class="col-lg-12 mb-4">
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                                    <h6 class="m-0 font-weight-bold text-primary">Interest Rate Management</h6>
-                                    <button class="btn btn-sm btn-secondary" onclick="hideInterestManagement()">
-                                        <i class="fas fa-times"></i> Close
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row mb-4">
-                                        <div class="col-md-12">
-                                            <h5 class="mb-3">Current Interest Rates</h5>
-                                            <div class="table-responsive">
-                                                <table class="table table-bordered table-striped">
-                                                    <thead class="table-dark">
-                                                        <tr>
-                                                            <th>Account Type</th>
-                                                            <th>Current Rate (%)</th>
-                                                            <th>New Rate (%)</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="interestRatesTableBody">
-                                                        <!-- Interest rates will be loaded here -->
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="d-flex justify-content-between">
-                                                <button type="button" class="btn btn-success" onclick="updateAllInterestRates()">
-                                                    <i class="fas fa-save"></i> Update All Rates
-                                                </button>
-                                                <button type="button" class="btn btn-info" onclick="applyInterestToAll()">
-                                                    <i class="fas fa-calculator"></i> Apply Interest to All Accounts
-                                                </button>
-                                                <button type="button" class="btn btn-secondary" onclick="loadInterestRates()">
-                                                    <i class="fas fa-sync-alt"></i> Refresh
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Status Messages -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div id="statusMessage" class="alert" style="display: none;"></div>
-                        </div>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - BankAuto</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/admin.css" rel="stylesheet">
@@ -329,9 +249,9 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-12 mb-3">
-                                            <button class="btn btn-warning btn-block w-100" onclick="loadPendingAccounts()">
+                                            <a class="btn btn-warning btn-block w-100" href="pendingAccounts.jsp">
                                                 <i class="fas fa-user-clock"></i> Account Approvals
-                                            </button>
+                                            </a>
                                         </div>
                                         <div class="col-md-12 mb-3">
                                             <button class="btn btn-success btn-block w-100" onclick="loadInterestManagement()">
@@ -375,52 +295,22 @@
                                                             <th>Account Type</th>
                                                             <th>Current Rate (%)</th>
                                                             <th>New Rate (%)</th>
+                                                            <th>Action</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td><strong>Savings Account</strong></td>
-                                                            <td><span id="currentSavingsRate" class="badge bg-info">-</span>%</td>
-                                                            <td>
-                                                                <input type="number" class="form-control" id="savingsRate" 
-                                                                       step="0.01" min="0" max="15" placeholder="Enter new rate (optional)">
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><strong>Checking Account</strong></td>
-                                                            <td><span id="currentCheckingRate" class="badge bg-info">-</span>%</td>
-                                                            <td>
-                                                                <input type="number" class="form-control" id="checkingRate" 
-                                                                       step="0.01" min="0" max="15" placeholder="Enter new rate (optional)">
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><strong>Current Account</strong></td>
-                                                            <td><span id="currentCurrentRate" class="badge bg-info">-</span>%</td>
-                                                            <td>
-                                                                <input type="number" class="form-control" id="currentRate" 
-                                                                       step="0.01" min="0" max="15" placeholder="Enter new rate (optional)">
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><strong>Fixed Deposit</strong></td>
-                                                            <td><span id="currentFixedRate" class="badge bg-info">-</span>%</td>
-                                                            <td>
-                                                                <input type="number" class="form-control" id="fixedRate" 
-                                                                       step="0.01" min="0" max="15" placeholder="Enter new rate (optional)">
-                                                            </td>
-                                                        </tr>
+                                                    <tbody id="interestRatesTableBody">
+                                                        <!-- Interest rates will be loaded here -->
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <div class="d-flex gap-2">
-                                                <button type="button" class="btn btn-primary btn-lg" onclick="updateInterestRates()">
-                                                    <i class="fas fa-save"></i> Update Interest Rates
+                                            <div class="d-flex justify-content-between">
+                                                <button type="button" class="btn btn-success" onclick="updateAllInterestRates()">
+                                                    <i class="fas fa-save"></i> Update All Rates
                                                 </button>
-                                                <button type="button" class="btn btn-success btn-lg" onclick="loadCurrentRates()">
-                                                    <i class="fas fa-refresh"></i> Refresh Current Rates
+                                                <button type="button" class="btn btn-secondary" onclick="loadInterestRates()">
+                                                    <i class="fas fa-sync-alt"></i> Refresh
                                                 </button>
-                                                <button type="button" class="btn btn-warning btn-lg" onclick="initializeRates()">
+                                                <button type="button" class="btn btn-warning" onclick="initializeRates()">
                                                     <i class="fas fa-database"></i> Initialize Default Rates
                                                 </button>
                                             </div>
@@ -500,7 +390,7 @@
                 
                 const accounts = await response.json();
                 showStatus('Found ' + accounts.length + ' pending accounts', 'info');
-                
+                window.location.href =approveAccounts.jsp; // Redirect to the accounts approval page
                 // You can add more functionality here to display the accounts
                 
             } catch (error) {
@@ -796,10 +686,6 @@
                 console.error('Error initializing rates:', error);
                 showStatus('Failed to initialize default rates', 'danger');
             }
-        }
-        
-        function hideInterestManagement() {
-            document.getElementById('interestManagementSection').style.display = 'none';
         }
         
         // Load initial data when page loads

@@ -6,6 +6,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import lk.jiat.bankauto.core.interceptor.LogMethod;
+import lk.jiat.bankauto.core.interceptor.PerformanceMonitor;
+import lk.jiat.bankauto.core.interceptor.SecurityCheck;
 import lk.jiat.bankauto.core.model.User;
 import lk.jiat.bankauto.core.service.UserService;
 
@@ -17,6 +20,9 @@ public class UserSessionBean implements UserService {
     @PersistenceContext(unitName = "BankAutoPU")
     private EntityManager entityManager;
 
+    @LogMethod
+    @SecurityCheck
+    @PerformanceMonitor
     @Override
     public User getUser(long id) {
         try {
@@ -28,71 +34,122 @@ public class UserSessionBean implements UserService {
 
     @Override
     public User getUserByUserName(String userName) {
-        return null;
+        try {
+            TypedQuery<User> query = entityManager.createQuery(
+                    "SELECT u FROM User u WHERE u.userName = :userName", User.class);
+            query.setParameter("userName", userName);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     @Override
     public User getUserByEmail(String email) {
-        return entityManager.createNamedQuery("User.findByEmail", User.class)
-                .setParameter("email", email)
-                .getSingleResult();
+        try{
+            return entityManager.createNamedQuery("User.findByEmail", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        }catch (NoResultException e) {
+            return null;
+        }
     }
 
     @Override
     public User getUserByPhone(String phoneNumber) {
-        return null;
+        try {
+            TypedQuery<User> query = entityManager.createQuery(
+                    "SELECT u FROM User u WHERE u.phoneNumber = :phoneNumber", User.class);
+            query.setParameter("phoneNumber", phoneNumber);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     @Override
+    @LogMethod
+    @SecurityCheck
+    @PerformanceMonitor
     public void  saveUser(User user) {
+        user.setCreatedAt(LocalDateTime.now());
         entityManager.persist(user);
     }
 
 
     @Override
     public User updateUser(User user) {
-        return null;
+        user.setUpdatedAt(LocalDateTime.now());
+        return entityManager.merge(user);
     }
 
     @Override
     public void deleteUser(long id) {
-
+        User user = entityManager.find(User.class, id);
+        if (user != null) {
+            entityManager.remove(user);
+        }
     }
 
     @Override
     public boolean isUserNameExists(String userName) {
-        return false;
+        try {
+            TypedQuery<Long> query = entityManager.createQuery(
+                    "SELECT COUNT(u) FROM User u WHERE u.userName = :userName", Long.class);
+            query.setParameter("userName", userName);
+            return query.getSingleResult() > 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public boolean isEmailExists(String email) {
-        return false;
+        try {
+            TypedQuery<Long> query = entityManager.createQuery(
+                    "SELECT COUNT(u) FROM User u WHERE u.email = :email", Long.class);
+            query.setParameter("email", email);
+            return query.getSingleResult() > 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public boolean isPhoneNumberExists(String phoneNumber) {
-        return false;
+        try {
+            TypedQuery<Long> query = entityManager.createQuery(
+                    "SELECT COUNT(u) FROM User u WHERE u.phoneNumber = :phoneNumber", Long.class);
+            query.setParameter("phoneNumber", phoneNumber);
+            return query.getSingleResult() > 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public boolean isNICExists(String nic) {
-        return false;
+        try {
+            TypedQuery<Long> query = entityManager.createQuery(
+                    "SELECT COUNT(u) FROM User u WHERE u.NIC = :nic", Long.class);
+            query.setParameter("nic", nic);
+            return query.getSingleResult() > 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
+    @LogMethod
+    @SecurityCheck
+    @PerformanceMonitor
     public boolean isUserExists(String email, String userName, String nic, String phoneNumber) {
-        return false;
+        return isEmailExists(email) || isUserNameExists(userName) ||
+                isNICExists(nic) || isPhoneNumberExists(phoneNumber);
     }
 
     @Override
     public User findUserByUsernameOrEmail(String login) {
-//        try{
-//            return entityManager.createNamedQuery("User.findByUsernameOrEmail", User.class)
-//                    .setParameter("login", login)
-//                    .getSingleResult();
-//        }catch (NoResultException e){
-//            return null;
-//        }
         try {
             TypedQuery<User> query = entityManager.createNamedQuery("User.findByUsernameOrEmail", User.class);
             query.setParameter("login", login);
@@ -107,10 +164,6 @@ public class UserSessionBean implements UserService {
 
     @Override
     public boolean validateUser(String email, String password) {
-//        User user =entityManager.createNamedQuery("User.findByEmail", User.class)
-//                .setParameter("email", email).getSingleResult();
-//
-//        return user != null && user.getPassword().equals(password);
         try {
             User user = getUserByEmail(email);
             if (user != null) {

@@ -1,6 +1,7 @@
 package lk.jiat.bankauto.ejb.bean;
 
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.DeclareRoles;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.*;
 import jakarta.persistence.EntityManager;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@DeclareRoles({"USER", "ADMIN"})
 @Stateless
 public class TransactionSessionBean implements TransferService {
 
