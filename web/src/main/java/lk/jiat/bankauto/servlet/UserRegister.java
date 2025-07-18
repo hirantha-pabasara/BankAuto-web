@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lk.jiat.bankauto.core.dto.ResponseMessage;
+import lk.jiat.bankauto.core.exception.UserAlreadyExistsException;
+import lk.jiat.bankauto.core.exception.ValidationException;
 import lk.jiat.bankauto.core.model.User;
 import lk.jiat.bankauto.core.service.UserService;
 
@@ -29,6 +31,10 @@ public class UserRegister extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd") // For DOB field
+                .create();
+
         try {
             BufferedReader reader = request.getReader();
             StringBuilder jsonString = new StringBuilder();
@@ -37,9 +43,7 @@ public class UserRegister extends HttpServlet {
                 jsonString.append(line);
             }
 
-            Gson gson = new GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd") // For DOB field
-                    .create();
+
 
             User user = gson.fromJson(jsonString.toString(), User.class);
 
@@ -62,7 +66,23 @@ public class UserRegister extends HttpServlet {
             out.write(gson.toJson(message));
             out.flush();
 
+        } catch (UserAlreadyExistsException e) {
+            ResponseMessage message = new ResponseMessage(false, e.getMessage());
+            PrintWriter out = response.getWriter();
+            out.write(gson.toJson(message));
+            out.flush();
+
+        } catch (ValidationException e) {
+            ResponseMessage message = new ResponseMessage(false, "Validation Error: " + e.getMessage());
+            PrintWriter out = response.getWriter();
+            out.write(gson.toJson(message));
+            out.flush();
+
         } catch (Exception e) {
+            ResponseMessage message = new ResponseMessage(false, "System Error: " + e.getMessage());
+            PrintWriter out = response.getWriter();
+            out.write(gson.toJson(message));
+            out.flush();
             e.printStackTrace();
         }
     }

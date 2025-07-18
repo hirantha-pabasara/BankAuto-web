@@ -41,9 +41,7 @@ class DashboardDataLoader {
         }
     }
 
-    /**
-     * Load user accounts (same as viewAccounts page)
-     */
+
     async loadUserAccounts() {
         try {
             const response = await fetch(`account-details`, {

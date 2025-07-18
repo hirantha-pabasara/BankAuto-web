@@ -21,7 +21,10 @@ import java.time.LocalDateTime;
         @NamedQuery(name = "Transaction.findScheduledTransfers",
                 query = "SELECT t FROM Transaction t WHERE t.status = 'SCHEDULED' AND t.scheduledDateTime <= :currentTime"),
         @NamedQuery(name = "Transaction.findRecurringTransfers",
-                query = "SELECT t FROM Transaction t WHERE t.transferType = 'RECURRING' AND t.status = 'ACTIVE'")
+                query = "SELECT t FROM Transaction t WHERE t.transferType = 'RECURRING' AND t.status = 'ACTIVE'"),
+        @NamedQuery(name = "Transaction.findByAccountIdAndDateRange",
+                query = "SELECT t FROM Transaction t WHERE (t.fromAccountId = :accountId OR t.toAccountId = :accountId) AND t.transactionDate BETWEEN :startDate AND :endDate ORDER BY t.transactionDate DESC")
+
 })
 public class Transaction implements Serializable {
     @Id

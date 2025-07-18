@@ -20,4 +20,5 @@ public interface TransferService {
     boolean cancelTransfer(Long transactionId, Long userId);
     TransferResult validateTransferRequest(TransferRequest request);
     List<Transaction> getPendingTransfers(Long userId);
+    List<Transaction> getTransactionsByUserName(String userName, LocalDateTime startDate, LocalDateTime endDate);
 }

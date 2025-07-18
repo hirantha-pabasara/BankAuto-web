@@ -11,69 +11,341 @@
     <link href="../css/user.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .transfer-status-pending { color: #ffc107; }
-        .transfer-status-completed { color: #198754; }
-        .transfer-status-failed { color: #dc3545; }
-        .transfer-status-scheduled { color: #0dcaf0; }
+        /*.transfer-status-pending { color: #ffc107; }*/
+        /*.transfer-status-completed { color: #198754; }*/
+        /*.transfer-status-failed { color: #dc3545; }*/
+        /*.transfer-status-scheduled { color: #0dcaf0; }*/
         .balance-info { font-size: 0.9em; color: #6c757d; }
         .validation-error { border-color: #dc3545; }
         .amount-warning { color: #dc3545; font-size: 0.8em; }
+
+
+         .transfer-status-pending { color: #ffc107; }
+        .transfer-status-completed { color: #198754; }
+        .transfer-status-failed { color: #dc3545; }
+        .transfer-status-scheduled { color: #0dcaf0; }
+
+        /* Modern Sidebar Design */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-brand:hover {
+            background: rgba(255,255,255,0.15);
+            text-decoration: none;
+        }
+
+        .sidebar-brand-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .sidebar-brand-icon i {
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .sidebar-brand-text {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-divider {
+            border-color: rgba(255,255,255,0.15);
+            margin: 0.5rem 0;
+        }
+
+        .nav-item {
+            margin: 0.2rem 1rem;
+        }
+
+        .nav-item .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-item .nav-link:hover::before {
+            left: 100%;
+        }
+
+        .nav-item .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-item.active .nav-link {
+            color: white;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .nav-item .nav-link i {
+            width: 20px;
+            margin-right: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .nav-item .nav-link span {
+            font-size: 0.95rem;
+        }
+
+        /* Content wrapper adjustment */
+        #content-wrapper {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Sidebar collapsed state */
+        .sidebar-toggled .sidebar {
+            width: 80px;
+        }
+
+        .sidebar-toggled #content-wrapper {
+            margin-left: 80px;
+        }
+
+        .sidebar-toggled .sidebar-brand-text,
+        .sidebar-toggled .nav-item .nav-link span {
+            display: none;
+        }
+
+        .sidebar-toggled .sidebar-brand {
+            padding: 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .sidebar-toggled .sidebar-brand-icon {
+            margin-right: 0;
+        }
+
+        .sidebar-toggled .nav-item {
+            margin: 0.2rem 0.5rem;
+        }
+
+        .sidebar-toggled .nav-item .nav-link {
+            text-align: center;
+            padding: 1rem 0.5rem;
+        }
+
+        .sidebar-toggled .nav-item .nav-link i {
+            margin-right: 0;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -280px;
+            }
+
+            .sidebar.show {
+                margin-left: 0;
+            }
+
+            #content-wrapper {
+                margin-left: 0;
+            }
+
+            .sidebar-toggled .sidebar {
+                margin-left: -80px;
+            }
+        }
+
+        /* Enhanced Header Styles - Remove opacity */
+        .topbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e3e6f0;
+            height: 80px;
+            padding: 0 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .welcome-message h5 {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2px;
+        }
+
+        .user-profile-display {
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            border: 1px solid #e3e6f0;
+        }
+
+        .user-profile-display:hover {
+            background: #f8f9fc;
+            border-color: #4e73df;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(78, 115, 223, 0.15);
+        }
+
+        .avatar-circle-enhanced {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-initials {
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 16px;
+            height: 16px;
+            background-color: #1cc88a;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(28, 200, 138, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(28, 200, 138, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(28, 200, 138, 0); }
+        }
+
+        .logout-btn {
+            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .logout-btn:hover {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .user-info {
+                display: none !important;
+            }
+
+            .avatar-circle-enhanced {
+                width: 45px;
+                height: 45px;
+            }
+
+            .welcome-message {
+                display: none !important;
+            }
+
+            .topbar {
+                padding: 0 1rem;
+                height: 65px;
+            }
+        }
+
+
     </style>
 </head>
 <body id="page-top">
     <div id="wrapper">
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion">
+        <ul class="navbar-nav sidebar sidebar-dark accordion">
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard.jsp">
                 <div class="sidebar-brand-icon">
                     <i class="fas fa-university"></i>
                 </div>
                 <div class="sidebar-brand-text mx-3">BankAuto</div>
             </a>
-            
+
             <hr class="sidebar-divider my-0">
-            
-            <li class="nav-item">
+
+            <li class="nav-item ">
                 <a class="nav-link" href="dashboard.jsp">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
-            
+
             <hr class="sidebar-divider">
-            
+
             <li class="nav-item">
                 <a class="nav-link" href="createAccount.jsp">
                     <i class="fas fa-fw fa-plus-circle"></i>
                     <span>Create Account</span>
                 </a>
             </li>
-            
+
             <li class="nav-item">
                 <a class="nav-link" href="viewAccounts.jsp">
                     <i class="fas fa-fw fa-credit-card"></i>
                     <span>My Accounts</span>
                 </a>
             </li>
-            
+
             <li class="nav-item active">
                 <a class="nav-link" href="transactions.jsp">
                     <i class="fas fa-fw fa-exchange-alt"></i>
                     <span>Transactions</span>
                 </a>
             </li>
-            
-            <li class="nav-item">
-                <a class="nav-link" href="notifications.jsp">
-                    <i class="fas fa-fw fa-bell"></i>
-                    <span>Notifications</span>
-                </a>
-            </li>
-            
+
             <hr class="sidebar-divider">
-            
+
             <li class="nav-item">
-                <a class="nav-link" href="../logout.jsp">
+                <a class="nav-link" href="javascript:void(0)" onclick="performLogout()">
                     <i class="fas fa-fw fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>

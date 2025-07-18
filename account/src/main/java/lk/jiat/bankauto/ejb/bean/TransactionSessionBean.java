@@ -15,12 +15,14 @@ import lk.jiat.bankauto.core.enums.TransactionType;
 import lk.jiat.bankauto.core.enums.TransferType;
 import lk.jiat.bankauto.core.model.BankAccount;
 import lk.jiat.bankauto.core.model.Transaction;
+import lk.jiat.bankauto.core.model.User;
 import lk.jiat.bankauto.core.service.AccountService;
 import lk.jiat.bankauto.core.service.TransferService;
 import jakarta.ejb.TimerService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -520,6 +522,43 @@ public class TransactionSessionBean implements TransferService {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error fetching pending transfers", e);
             return List.of();
+        }
+    }
+
+    //Load transactions by user name and date range
+
+    @Override
+    public List<Transaction> getTransactionsByUserName(String userName, LocalDateTime startDate, LocalDateTime endDate) {
+        try {
+            // Step 1: Get user by username
+            TypedQuery<User> userQuery = em.createNamedQuery("User.findByUsernameOrEmail", User.class);
+            userQuery.setParameter("login", userName);
+            User user = userQuery.getSingleResult();
+
+            // Step 2: Get all user's accounts
+            TypedQuery<BankAccount> accountQuery = em.createQuery(
+                    "SELECT a FROM BankAccount a WHERE a.userId = :userId", BankAccount.class);
+            accountQuery.setParameter("userId", user.getId());
+            List<BankAccount> accounts = accountQuery.getResultList();
+
+            // Step 3: Get all transactions for user's accounts
+            List<Transaction> allTransactions = new ArrayList<>();
+            for (BankAccount account : accounts) {
+                TypedQuery<Transaction> txnQuery = em.createNamedQuery("Transaction.findByAccountIdAndDateRange", Transaction.class);
+                txnQuery.setParameter("accountId", account.getId());
+                txnQuery.setParameter("startDate", startDate);
+                txnQuery.setParameter("endDate", endDate);
+                allTransactions.addAll(txnQuery.getResultList());
+            }
+
+            // Step 4: Sort by date (newest first)
+            allTransactions.sort((t1, t2) -> t2.getTransactionDate().compareTo(t1.getTransactionDate()));
+
+            return allTransactions;
+
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error fetching transactions for user: " + userName, e);
+            return new ArrayList<>();
         }
     }
 

@@ -2,15 +2,19 @@ package lk.jiat.bankauto.ejb.bean;
 
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import lk.jiat.bankauto.core.dto.AccountCreationRequest;
 import lk.jiat.bankauto.core.enums.AccountStatus;
 import lk.jiat.bankauto.core.model.BankAccount;
+import lk.jiat.bankauto.core.model.User;
 import lk.jiat.bankauto.core.service.AccountService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Stateless
@@ -146,4 +150,57 @@ public class AccountSessionBean implements AccountService {
         query.setParameter("accountType", accountType);
         return query.getSingleResult() > 0;
     }
+
+    @Override
+    public List<BankAccount> getAccountsByUserName(String userName) {
+        try {
+            logger.info("Fetching accounts for user name: " + userName);
+
+            // First, get the user by userName to get the user ID
+            TypedQuery<User> userQuery = em.createNamedQuery("User.findByUsernameOrEmail", User.class);
+            userQuery.setParameter("login", userName);
+
+            User user = userQuery.getSingleResult();
+
+            // Then get accounts by user ID (assuming your BankAccount has userId field)
+            TypedQuery<BankAccount> accountQuery = em.createQuery(
+                    "SELECT a FROM BankAccount a WHERE a.userId = :userId AND a.status = :status",
+                    BankAccount.class
+            );
+            accountQuery.setParameter("userId", user.getId());
+            accountQuery.setParameter("status", AccountStatus.ACTIVE);
+
+            List<BankAccount> accounts = accountQuery.getResultList();
+            logger.info("Found " + accounts.size() + " accounts for user: " + userName);
+
+            return accounts;
+
+        } catch (NoResultException e) {
+            logger.warning("User not found: " + userName);
+            return new ArrayList<>();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error fetching accounts for user: " + userName, e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Object[]> getPendingAccountsWithUserDetails() {
+
+            try {
+                TypedQuery<Object[]> query = em.createQuery(
+                        "SELECT a, u FROM BankAccount a JOIN User u ON a.userId = u.id " +
+                                "WHERE a.status = :status ORDER BY a.createdAt ASC",
+                        Object[].class);
+                query.setParameter("status", AccountStatus.PENDING_APPROVAL);
+                return query.getResultList();
+            } catch (Exception e) {
+                logger.severe("Error fetching pending accounts with user details: " + e.getMessage());
+                return new ArrayList<>();
+            }
+
+
+    }
+
+
 }
