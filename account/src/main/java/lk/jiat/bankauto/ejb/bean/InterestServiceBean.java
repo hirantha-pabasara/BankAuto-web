@@ -36,14 +36,12 @@ public class InterestServiceBean implements InterestService {
     @Override
     public void setInterestRate(String accountType, BigDecimal rate) {
         try {
-            // Find existing rate for this account type
             TypedQuery<InterestRate> query = em.createNamedQuery("InterestRate.findByAccountType", InterestRate.class);
             query.setParameter("accountType", accountType);
             
             List<InterestRate> existingRates = query.getResultList();
             
             if (!existingRates.isEmpty()) {
-                // Update existing rate
                 InterestRate interestRate = existingRates.get(0);
                 interestRate.setRate(rate);
                 interestRate.setUpdatedAt(LocalDateTime.now());
@@ -73,8 +71,7 @@ public class InterestServiceBean implements InterestService {
             if (!rates.isEmpty()) {
                 return rates.get(0).getRate();
             }
-            
-            // Return default rates if not set
+
             return getDefaultRate(accountType);
             
         } catch (Exception e) {
@@ -90,8 +87,7 @@ public class InterestServiceBean implements InterestService {
         
         try {
             logger.info("Starting interest calculation for all accounts...");
-            
-            // Get all active accounts with positive balance
+
             TypedQuery<BankAccount> query = em.createQuery(
                 "SELECT a FROM BankAccount a WHERE a.status = :status AND a.balance > 0", 
                 BankAccount.class);
@@ -109,7 +105,6 @@ public class InterestServiceBean implements InterestService {
                     }
                 } catch (Exception e) {
                     logger.warning("Failed to apply interest to account " + account.getAccountNumber() + ": " + e.getMessage());
-                    // Continue with other accounts even if one fails
                 }
             }
             
@@ -145,11 +140,6 @@ public class InterestServiceBean implements InterestService {
         }
     }
 
-    /**
-     * Internal method to apply interest to a specific account
-     * @param account The account to apply interest to
-     * @return The amount of interest applied
-     */
     private BigDecimal applyInterestToAccountInternal(BankAccount account) {
         if (account == null || account.getStatus() != AccountStatus.ACTIVE || 
             account.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
@@ -181,23 +171,12 @@ public class InterestServiceBean implements InterestService {
         
         return interestAmount;
     }
-    
-    /**
-     * Creates a transaction record for the interest credit
-     * @param account The account that received interest
-     * @param interestAmount The amount of interest applied
-     * @param oldBalance The account balance before interest
-     * @param newBalance The account balance after interest
-     * @param interestRate The annual interest rate used
-     */
+
     private void createInterestTransaction(BankAccount account, BigDecimal interestAmount, 
                                          BigDecimal oldBalance, BigDecimal newBalance, BigDecimal interestRate) {
         try {
-            // Create transaction record for transparency
             Transaction interestTransaction = new Transaction();
-            
-            // Set basic transaction information
-            // For interest transactions, use the account ID as both from and to (self-credit)
+
             interestTransaction.setFromAccountId(account.getId());
             interestTransaction.setToAccountId(account.getId());
             interestTransaction.setToAccountIdentifier(account.getAccountNumber());
@@ -205,27 +184,22 @@ public class InterestServiceBean implements InterestService {
             interestTransaction.setTransactionType(TransactionType.INTEREST);
             interestTransaction.setTransferType(TransferType.IMMEDIATE);
             interestTransaction.setStatus(TransactionStatus.COMPLETED);
-            
-            // Set description with details
+
             String description = String.format("Monthly Interest Credit - %.2f%% APR on %s Account", 
                                               interestRate, account.getAccountType());
             interestTransaction.setDescription(description);
-            
-            // Set timing information
+
             LocalDateTime now = LocalDateTime.now();
             interestTransaction.setTransactionDate(now);
             interestTransaction.setProcessedDate(now);
             interestTransaction.setCreatedBy(1L); // System user ID
             interestTransaction.setProcessedBy(1L); // System user ID
-            
-            // Set balance information
+
             interestTransaction.setBalanceAfterTransaction(newBalance);
-            
-            // Generate reference number for interest transactions
+
             String referenceNumber = "INT" + System.currentTimeMillis() + String.format("%04d", (int)(Math.random() * 10000));
             interestTransaction.setReferenceNumber(referenceNumber);
-            
-            // Persist the transaction
+
             em.persist(interestTransaction);
             
             logger.info("Created interest transaction record: " + referenceNumber + 
@@ -234,9 +208,7 @@ public class InterestServiceBean implements InterestService {
         } catch (Exception e) {
             logger.warning("Failed to create interest transaction record for account " + 
                           account.getAccountNumber() + ": " + e.getMessage());
-            e.printStackTrace(); // Add stack trace for debugging
-            // Don't throw exception as interest was already applied to account
-            // This ensures interest calculation continues even if transaction logging fails
+            e.printStackTrace();
         }
     }
 

@@ -156,13 +156,11 @@ public class AccountSessionBean implements AccountService {
         try {
             logger.info("Fetching accounts for user name: " + userName);
 
-            // First, get the user by userName to get the user ID
             TypedQuery<User> userQuery = em.createNamedQuery("User.findByUsernameOrEmail", User.class);
             userQuery.setParameter("login", userName);
 
             User user = userQuery.getSingleResult();
 
-            // Then get accounts by user ID (assuming your BankAccount has userId field)
             TypedQuery<BankAccount> accountQuery = em.createQuery(
                     "SELECT a FROM BankAccount a WHERE a.userId = :userId AND a.status = :status",
                     BankAccount.class
@@ -200,6 +198,22 @@ public class AccountSessionBean implements AccountService {
             }
 
 
+    }
+
+    @Override
+    public List<Long> getAccountIdsByUserId(Long userId) {
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT a.id FROM BankAccount a WHERE a.userId = :userId AND a.status = :status",
+                    Long.class
+            );
+            query.setParameter("status", AccountStatus.ACTIVE);
+            query.setParameter("userId", userId);
+            return query.getResultList();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error fetching account IDs for user: " + userId, e);
+            return new ArrayList<>();
+        }
     }
 
 

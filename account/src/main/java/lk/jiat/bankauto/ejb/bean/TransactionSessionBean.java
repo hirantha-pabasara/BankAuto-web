@@ -80,7 +80,7 @@ public class TransactionSessionBean implements TransferService {
                 logger.severe("CRITICAL: Source account not found - Account ID: " + request.getFromAccountId());
                 return TransferResult.failure("Source account not found", "ACCOUNT_NOT_FOUND");
             }
-            
+
             logger.info("Source account retrieved successfully:");
             logger.info("  - Account Number: " + fromAccount.getAccountNumber());
             logger.info("  - Account Type: " + fromAccount.getAccountType());
@@ -91,10 +91,10 @@ public class TransactionSessionBean implements TransferService {
             logger.info("Checking account balance sufficiency...");
             logger.info("Required amount: " + request.getAmount());
             logger.info("Available balance: " + fromAccount.getBalance());
-            
+
             if (fromAccount.getBalance().compareTo(request.getAmount()) < 0) {
-                logger.warning("INSUFFICIENT BALANCE - Required: " + request.getAmount() + 
-                              ", Available: " + fromAccount.getBalance());
+                logger.warning("INSUFFICIENT BALANCE - Required: " + request.getAmount() +
+                        ", Available: " + fromAccount.getBalance());
                 return TransferResult.failure("Insufficient balance", "INSUFFICIENT_BALANCE");
             }
             logger.info("Balance check passed - sufficient funds available");
@@ -114,7 +114,7 @@ public class TransactionSessionBean implements TransferService {
             transaction.setStatus(TransactionStatus.PROCESSING);
             em.persist(transaction);
             em.flush();
-            
+
             logger.info("Transaction record created successfully:");
             logger.info("  - Transaction ID: " + transaction.getTransactionId());
             logger.info("  - Reference Number: " + transaction.getReferenceNumber());
@@ -138,7 +138,7 @@ public class TransactionSessionBean implements TransferService {
                 logger.info("TRANSFER COMPLETED SUCCESSFULLY in " + totalTime + "ms");
                 logger.info("Reference Number: " + transaction.getReferenceNumber());
                 logger.info("New account balance: " + fromAccount.getBalance());
-                
+
                 return TransferResult.success("Transfer completed successfully", transaction.getReferenceNumber());
             } else {
                 logger.severe("Transfer execution failed - updating transaction status");
@@ -157,7 +157,7 @@ public class TransactionSessionBean implements TransferService {
             logger.severe("  - From Account ID: " + request.getFromAccountId());
             logger.severe("  - Amount: " + request.getAmount());
             logger.severe("  - Error: " + e.getMessage());
-            
+
             sessionContext.setRollbackOnly();
             return TransferResult.failure("An unexpected error occurred", "SYSTEM_ERROR");
         } finally {
@@ -174,13 +174,11 @@ public class TransactionSessionBean implements TransferService {
         logger.info("Scheduling transfer for: " + request.getScheduledDateTime());
 
         try {
-            // Validate transfer request
             TransferResult validation = validateTransferRequest(request);
             if (!validation.isSuccess()) {
                 return validation;
             }
 
-            // Validate scheduled date
             if (request.getScheduledDateTime().isBefore(LocalDateTime.now())) {
                 return TransferResult.failure("Scheduled date must be in the future", "INVALID_SCHEDULE_DATE");
             }
@@ -228,13 +226,11 @@ public class TransactionSessionBean implements TransferService {
         logger.info("Setting up recurring transfer with frequency: " + request.getFrequency());
 
         try {
-            // Validate transfer request
             TransferResult validation = validateTransferRequest(request);
             if (!validation.isSuccess()) {
                 return validation;
             }
 
-            // Create recurring transaction record
             Transaction transaction = new Transaction(
                     request.getFromAccountId(),
                     request.getToAccount(),
@@ -249,24 +245,22 @@ public class TransactionSessionBean implements TransferService {
             transaction.setStartDate(request.getStartDate());
             transaction.setEndDate(request.getEndDate());
             transaction.setFrequency(RecurrenceFrequency.valueOf(request.getFrequency()));
-            
-            // Calculate next execution date - if start date is in the past, use current time
+
             LocalDateTime nextExecution = request.getStartDate();
             LocalDateTime now = LocalDateTime.now();
-            
-            // If start date is in the past, start from the next interval from now
+
             if (nextExecution.isBefore(now)) {
                 nextExecution = now;
             }
-            
+
             transaction.setNextExecutionDate(calculateNextExecutionDate(nextExecution, request.getFrequency()));
 
             em.persist(transaction);
             em.flush();
 
-            logger.info("Recurring transfer setup successfully: " + transaction.getReferenceNumber() + 
-                       ", Next execution: " + transaction.getNextExecutionDate() + 
-                       ", Frequency: " + request.getFrequency());
+            logger.info("Recurring transfer setup successfully: " + transaction.getReferenceNumber() +
+                    ", Next execution: " + transaction.getNextExecutionDate() +
+                    ", Frequency: " + request.getFrequency());
             return TransferResult.success("Recurring transfer setup successfully", transaction.getReferenceNumber());
 
         } catch (Exception e) {
@@ -286,7 +280,6 @@ public class TransactionSessionBean implements TransferService {
             Transaction transaction = em.find(Transaction.class, transactionId);
 
             if (transaction != null && transaction.getStatus() == TransactionStatus.SCHEDULED) {
-                // Execute the scheduled transfer
                 executeScheduledTransfer(transaction);
             }
 
@@ -296,29 +289,26 @@ public class TransactionSessionBean implements TransferService {
     }
 
 
-
-
     @Override
     public void processScheduledTransfers() {
         logger.info("Processing scheduled transfers manually");
-        
+
         try {
             LocalDateTime now = LocalDateTime.now();
-            
-            // Find all scheduled transfers that are due for execution
+
             TypedQuery<Transaction> query = em.createNamedQuery("Transaction.findScheduledTransfers", Transaction.class);
             query.setParameter("currentTime", now);
-            query.setMaxResults(50); // Limit for performance
-            
+            query.setMaxResults(50);
+
             List<Transaction> scheduledTransfers = query.getResultList();
-            
+
             logger.info("Found " + scheduledTransfers.size() + " scheduled transfers to process");
-            
+
             for (Transaction transaction : scheduledTransfers) {
                 logger.info("Processing scheduled transfer: " + transaction.getReferenceNumber());
                 executeScheduledTransfer(transaction);
             }
-            
+
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error processing scheduled transfers", e);
         }
@@ -349,6 +339,7 @@ public class TransactionSessionBean implements TransferService {
         }
     }
 
+
     @Override
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     @RolesAllowed({"USER", "ADMIN"})
@@ -357,15 +348,16 @@ public class TransactionSessionBean implements TransferService {
             TypedQuery<Transaction> query;
 
             if (startDate != null && endDate != null) {
-                query = em.createNamedQuery("Transaction.findByDateRange", Transaction.class);
+                query = em.createNamedQuery("Transaction.findByAccountIdAndDateRange", Transaction.class);
                 query.setParameter("startDate", startDate);
                 query.setParameter("endDate", endDate);
+                query.setParameter("accountId", accountId);
             } else {
                 query = em.createNamedQuery("Transaction.findByAccountId", Transaction.class);
+                query.setParameter("accountId", accountId);
             }
 
-            query.setParameter("accountId", accountId);
-            query.setMaxResults(100); // Limit for performance
+            query.setMaxResults(100);
 
             return query.getResultList();
 
@@ -374,6 +366,7 @@ public class TransactionSessionBean implements TransferService {
             return List.of();
         }
     }
+
 
     @Override
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -404,7 +397,6 @@ public class TransactionSessionBean implements TransferService {
                 transaction.setProcessedBy(userId);
                 em.merge(transaction);
 
-                // Cancel associated timers if any
                 cancelAssociatedTimers(transactionId);
 
                 return true;
@@ -420,24 +412,23 @@ public class TransactionSessionBean implements TransferService {
     }
 
 
-
     @Override
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public TransferResult validateTransferRequest(TransferRequest request) {
         logger.info("=================================================================");
         logger.info("TRANSFER REQUEST VALIDATION STARTED");
         logger.info("=================================================================");
-        
+
         logger.info("Validating transfer request:");
         logger.info("  - User ID: " + request.getUserId());
         logger.info("  - From Account ID: " + request.getFromAccountId());
         logger.info("  - To Account: " + request.getToAccount());
         logger.info("  - Amount: " + request.getAmount());
         logger.info("  - Transfer Type: " + request.getTransferType());
-        
+
         // Basic validation
         logger.info("Performing basic field validation...");
-        
+
         if (request.getFromAccountId() == null) {
             logger.warning("Validation failed: Source account is missing");
             return TransferResult.failure("Source account is required", "MISSING_FROM_ACCOUNT");
@@ -461,7 +452,7 @@ public class TransactionSessionBean implements TransferService {
             return TransferResult.failure("Amount exceeds maximum transfer limit", "AMOUNT_LIMIT_EXCEEDED");
         }
         logger.info("✓ Amount limit validation passed");
-        
+
         // Additional validations based on transfer type
         if (request.getTransferType() != null) {
             logger.info("Validating transfer type specific requirements...");
@@ -477,7 +468,7 @@ public class TransactionSessionBean implements TransferService {
                     }
                     logger.info("✓ Scheduled transfer validation passed");
                     break;
-                    
+
                 case "RECURRING":
                     if (request.getStartDate() == null) {
                         logger.warning("Validation failed: Recurring transfer missing start date");
@@ -489,7 +480,7 @@ public class TransactionSessionBean implements TransferService {
                     }
                     logger.info("✓ Recurring transfer validation passed");
                     break;
-                    
+
                 default:
                     logger.info("✓ Standard transfer validation (no additional requirements)");
                     break;
@@ -500,7 +491,7 @@ public class TransactionSessionBean implements TransferService {
         logger.info("=================================================================");
         logger.info("TRANSFER REQUEST VALIDATION COMPLETED");
         logger.info("=================================================================");
-        
+
         return TransferResult.success("Validation passed", null);
     }
 
@@ -525,7 +516,6 @@ public class TransactionSessionBean implements TransferService {
         }
     }
 
-    //Load transactions by user name and date range
 
     @Override
     public List<Transaction> getTransactionsByUserName(String userName, LocalDateTime startDate, LocalDateTime endDate) {
@@ -567,7 +557,7 @@ public class TransactionSessionBean implements TransferService {
         logger.info("=================================================================");
         logger.info("FUND TRANSFER EXECUTION STARTED");
         logger.info("=================================================================");
-        
+
         try {
             logger.info("Transfer execution details:");
             logger.info("  - From Account: " + fromAccount.getAccountNumber());
@@ -575,89 +565,89 @@ public class TransactionSessionBean implements TransferService {
             logger.info("  - To Account: " + request.getToAccount());
             logger.info("  - Transfer Amount: " + request.getAmount());
             logger.info("  - Transaction ID: " + transaction.getTransactionId());
-            
+
             // Deduct from source account
             logger.info("Deducting amount from source account...");
             BigDecimal originalBalance = fromAccount.getBalance();
             BigDecimal newBalance = fromAccount.getBalance().subtract(request.getAmount());
-            
+
             logger.info("Balance calculation:");
             logger.info("  - Original Balance: " + originalBalance);
             logger.info("  - Transfer Amount: " + request.getAmount());
             logger.info("  - New Balance: " + newBalance);
-            
+
             if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
                 logger.severe("CRITICAL: New balance would be negative! Transfer aborted.");
                 logger.severe("This should not happen as balance was checked earlier.");
                 return false;
             }
-            
+
             fromAccount.setBalance(newBalance);
             logger.info("Updating account balance in database...");
             em.merge(fromAccount);
-            
+
             transaction.setBalanceAfterTransaction(newBalance);
             logger.info("Transaction updated with new balance: " + newBalance);
 
             // Process destination account crediting
             logger.info("Destination account processing:");
             logger.info("  - Destination: " + request.getToAccount());
-            
+
             if (isInternalAccount(request.getToAccount())) {
                 logger.info("  - Type: Internal account transfer");
-                
+
                 // Credit the destination account
                 BankAccount toAccount = accountService.getAccountByNumber(request.getToAccount());
                 if (toAccount != null) {
                     logger.info("  - Destination account found: " + toAccount.getAccountNumber());
                     logger.info("  - Destination balance (before): " + toAccount.getBalance());
-                    
+
                     BigDecimal newToBalance = toAccount.getBalance().add(request.getAmount());
                     toAccount.setBalance(newToBalance);
                     em.merge(toAccount);
-                    
+
                     logger.info("  - Destination balance (after): " + newToBalance);
-                    logger.info("  - INTERNAL TRANSFER COMPLETED: Funds transferred from " + 
-                               fromAccount.getAccountNumber() + " to " + toAccount.getAccountNumber());
-                    
+                    logger.info("  - INTERNAL TRANSFER COMPLETED: Funds transferred from " +
+                            fromAccount.getAccountNumber() + " to " + toAccount.getAccountNumber());
+
                     // Create a corresponding credit transaction record for the destination account
                     Transaction creditTransaction = new Transaction(
-                        toAccount.getId(),
-                        fromAccount.getAccountNumber(),
-                        request.getAmount(),
-                        TransactionType.DEPOSIT,
-                        TransferType.IMMEDIATE,
-                        "Transfer received from " + fromAccount.getAccountNumber() + 
-                        (request.getDescription() != null ? " - " + request.getDescription() : ""),
-                        request.getUserId()
+                            toAccount.getId(),
+                            fromAccount.getAccountNumber(),
+                            request.getAmount(),
+                            TransactionType.DEPOSIT,
+                            TransferType.IMMEDIATE,
+                            "Transfer received from " + fromAccount.getAccountNumber() +
+                                    (request.getDescription() != null ? " - " + request.getDescription() : ""),
+                            request.getUserId()
                     );
                     creditTransaction.setStatus(TransactionStatus.COMPLETED);
                     creditTransaction.setProcessedDate(LocalDateTime.now());
                     creditTransaction.setBalanceAfterTransaction(newToBalance);
                     creditTransaction.setReferenceNumber(transaction.getReferenceNumber() + "-CR");
                     em.persist(creditTransaction);
-                    
+
                     logger.info("  - Credit transaction record created: " + creditTransaction.getReferenceNumber());
                 } else {
                     logger.severe("  - CRITICAL ERROR: Destination account not found: " + request.getToAccount());
                     logger.severe("  - Reversing debit transaction...");
-                    
+
                     // Reverse the debit - restore original balance
                     fromAccount.setBalance(originalBalance);
                     em.merge(fromAccount);
                     transaction.setBalanceAfterTransaction(originalBalance);
-                    
+
                     logger.severe("  - Debit transaction reversed. Balance restored to: " + originalBalance);
                     return false;
                 }
-                
+
             } else if (isEmailAddress(request.getToAccount())) {
                 logger.info("  - Type: Email-based transfer");
                 logger.info("  - External transfer to email: " + request.getToAccount());
                 logger.info("  - Amount successfully debited from source account");
                 logger.info("  - Note: External email transfers are processed by external payment gateway");
                 // For email transfers, we assume the external gateway will handle delivery
-                
+
             } else {
                 logger.info("  - Type: External account transfer");
                 logger.info("  - External transfer to account: " + request.getToAccount());
@@ -683,13 +673,13 @@ public class TransactionSessionBean implements TransferService {
             logger.info("=================================================================");
         }
     }
-    
+
     private boolean isInternalAccount(String toAccount) {
         // Check if the destination account is an internal bank account
         // Pattern: ACC1234567890, SAV1234567890, etc.
         return toAccount != null && toAccount.matches("^[A-Z]{3}\\d{10}$");
     }
-    
+
     private boolean isEmailAddress(String toAccount) {
         // Simple email validation
         return toAccount != null && toAccount.contains("@") && toAccount.contains(".");
@@ -705,7 +695,7 @@ public class TransactionSessionBean implements TransferService {
         logger.info("  - Amount: " + transaction.getAmount());
         logger.info("  - From Account ID: " + transaction.getFromAccountId());
         logger.info("  - To Account: " + transaction.getToAccountIdentifier());
-        
+
         try {
             // Get the source account
             BankAccount fromAccount = accountService.getAccountById(transaction.getFromAccountId());
@@ -717,23 +707,23 @@ public class TransactionSessionBean implements TransferService {
                 em.merge(transaction);
                 return;
             }
-            
+
             // Check sufficient balance
             if (fromAccount.getBalance().compareTo(transaction.getAmount()) < 0) {
-                logger.warning("INSUFFICIENT BALANCE - Required: " + transaction.getAmount() + 
-                              ", Available: " + fromAccount.getBalance());
+                logger.warning("INSUFFICIENT BALANCE - Required: " + transaction.getAmount() +
+                        ", Available: " + fromAccount.getBalance());
                 transaction.setStatus(TransactionStatus.FAILED);
                 transaction.setFailureReason("Insufficient balance");
                 transaction.setProcessedDate(LocalDateTime.now());
                 em.merge(transaction);
                 return;
             }
-            
+
             // Update transaction status to processing
             transaction.setStatus(TransactionStatus.PROCESSING);
             transaction.setProcessedDate(LocalDateTime.now());
             em.merge(transaction);
-            
+
             // Create a TransferRequest object for the execution
             TransferRequest request = new TransferRequest();
             request.setFromAccountId(transaction.getFromAccountId());
@@ -742,10 +732,10 @@ public class TransactionSessionBean implements TransferService {
             request.setDescription(transaction.getDescription());
             request.setTransferType("IMMEDIATE"); // Execute as immediate for processing
             request.setUserId(transaction.getCreatedBy());
-            
+
             // Execute the transfer using the existing executeTransfer method
             boolean transferSuccess = executeTransfer(fromAccount, request, transaction);
-            
+
             if (transferSuccess) {
                 logger.info("Scheduled transfer executed successfully");
                 transaction.setStatus(TransactionStatus.COMPLETED);
@@ -759,7 +749,7 @@ public class TransactionSessionBean implements TransferService {
                 transaction.setProcessedDate(LocalDateTime.now());
                 em.merge(transaction);
             }
-            
+
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error executing scheduled transfer", e);
             transaction.setStatus(TransactionStatus.FAILED);
@@ -783,9 +773,8 @@ public class TransactionSessionBean implements TransferService {
         logger.info("  - Amount: " + transaction.getAmount());
         logger.info("  - Frequency: " + transaction.getFrequency());
         logger.info("  - Next Execution: " + transaction.getNextExecutionDate());
-        
+
         try {
-            // Check if the recurring transfer is still active and within date range
             LocalDateTime now = LocalDateTime.now();
             if (transaction.getEndDate() != null && now.isAfter(transaction.getEndDate())) {
                 logger.info("Recurring transfer has expired, marking as completed");
@@ -794,41 +783,41 @@ public class TransactionSessionBean implements TransferService {
                 em.merge(transaction);
                 return;
             }
-            
+
             // Get the source account
             BankAccount fromAccount = accountService.getAccountById(transaction.getFromAccountId());
             if (fromAccount == null) {
                 logger.severe("CRITICAL: Source account not found - Account ID: " + transaction.getFromAccountId());
                 return;
             }
-            
+
             // Check sufficient balance
             if (fromAccount.getBalance().compareTo(transaction.getAmount()) < 0) {
-                logger.warning("INSUFFICIENT BALANCE for recurring transfer - Required: " + transaction.getAmount() + 
-                              ", Available: " + fromAccount.getBalance());
+                logger.warning("INSUFFICIENT BALANCE for recurring transfer - Required: " + transaction.getAmount() +
+                        ", Available: " + fromAccount.getBalance());
                 // Update next execution date and continue (don't mark as failed)
                 transaction.setNextExecutionDate(calculateNextExecutionDate(
-                    transaction.getNextExecutionDate(), 
-                    transaction.getFrequency().toString()));
+                        transaction.getNextExecutionDate(),
+                        transaction.getFrequency().toString()));
                 em.merge(transaction);
                 return;
             }
-            
+
             // Create a new transaction instance for this execution
             Transaction newTransaction = new Transaction(
-                transaction.getFromAccountId(),
-                transaction.getToAccountIdentifier(),
-                transaction.getAmount(),
-                TransactionType.TRANSFER,
-                TransferType.RECURRING,
-                "Recurring transfer: " + transaction.getDescription(),
-                transaction.getCreatedBy()
+                    transaction.getFromAccountId(),
+                    transaction.getToAccountIdentifier(),
+                    transaction.getAmount(),
+                    TransactionType.TRANSFER,
+                    TransferType.RECURRING,
+                    "Recurring transfer: " + transaction.getDescription(),
+                    transaction.getCreatedBy()
             );
-            
+
             newTransaction.setStatus(TransactionStatus.PROCESSING);
             em.persist(newTransaction);
             em.flush();
-            
+
             // Create a TransferRequest object for the execution
             TransferRequest request = new TransferRequest();
             request.setFromAccountId(transaction.getFromAccountId());
@@ -837,24 +826,24 @@ public class TransactionSessionBean implements TransferService {
             request.setDescription("Recurring transfer: " + transaction.getDescription());
             request.setTransferType("IMMEDIATE"); // Execute as immediate for processing
             request.setUserId(transaction.getCreatedBy());
-            
+
             // Execute the transfer
             boolean transferSuccess = executeTransfer(fromAccount, request, newTransaction);
-            
+
             if (transferSuccess) {
                 logger.info("Recurring transfer executed successfully");
                 newTransaction.setStatus(TransactionStatus.COMPLETED);
                 newTransaction.setProcessedDate(LocalDateTime.now());
                 newTransaction.setProcessedBy(transaction.getCreatedBy());
                 em.merge(newTransaction);
-                
+
                 // Update the next execution date for the recurring transaction
                 LocalDateTime nextExecution = calculateNextExecutionDate(
-                    transaction.getNextExecutionDate(), 
-                    transaction.getFrequency().toString());
+                        transaction.getNextExecutionDate(),
+                        transaction.getFrequency().toString());
                 transaction.setNextExecutionDate(nextExecution);
                 em.merge(transaction);
-                
+
                 logger.info("Next recurring transfer scheduled for: " + nextExecution);
             } else {
                 logger.severe("Recurring transfer execution failed");
@@ -862,20 +851,20 @@ public class TransactionSessionBean implements TransferService {
                 newTransaction.setFailureReason("Transfer execution failed");
                 newTransaction.setProcessedDate(LocalDateTime.now());
                 em.merge(newTransaction);
-                
+
                 // Still update next execution date to try again next time
                 transaction.setNextExecutionDate(calculateNextExecutionDate(
-                    transaction.getNextExecutionDate(), 
-                    transaction.getFrequency().toString()));
+                        transaction.getNextExecutionDate(),
+                        transaction.getFrequency().toString()));
                 em.merge(transaction);
             }
-            
+
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error processing recurring transfer", e);
             // Update next execution date even on error to prevent infinite retries
             transaction.setNextExecutionDate(calculateNextExecutionDate(
-                transaction.getNextExecutionDate(), 
-                transaction.getFrequency().toString()));
+                    transaction.getNextExecutionDate(),
+                    transaction.getFrequency().toString()));
             em.merge(transaction);
         } finally {
             logger.info("=================================================================");

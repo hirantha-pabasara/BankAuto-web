@@ -10,220 +10,181 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body id="page-top">
-    <div id="wrapper">
+    <div class="d-flex">
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard.jsp">
-                <div class="sidebar-brand-icon">
-                    <i class="fas fa-university"></i>
-                </div>
-                <div class="sidebar-brand-text mx-3">BankAuto Admin</div>
-            </a>
-            
-            <hr class="sidebar-divider my-0">
-            
-            <li class="nav-item">
-                <a class="nav-link" href="dashboard.jsp">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            
-            <hr class="sidebar-divider">
-            
-            <li class="nav-item">
-                <a class="nav-link" href="pendingAccounts.jsp">
-                    <i class="fas fa-fw fa-user-clock"></i>
-                    <span>Pending Accounts</span>
-                </a>
-            </li>
-            
-            <li class="nav-item active">
-                <a class="nav-link" href="approveAccount.jsp">
-                    <i class="fas fa-fw fa-user-check"></i>
-                    <span>Approve Accounts</span>
-                </a>
-            </li>
-            
-            <li class="nav-item">
-                <a class="nav-link" href="viewLogs.jsp">
-                    <i class="fas fa-fw fa-list"></i>
-                    <span>View Logs</span>
-                </a>
-            </li>
-            
-            <hr class="sidebar-divider">
-            
-            <li class="nav-item">
-                <a class="nav-link" href="javascript:void(0)" onclick="performLogout()">
-                    <i class="fas fa-fw fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </li>
-        </ul>
-        
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-            <div id="content">
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
-                    
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Admin</span>
-                                <i class="fas fa-user-circle fa-fw"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
-                                <a class="dropdown-item" href="javascript:void(0)" onclick="performLogout()">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
-                </nav>
-                
-                <!-- Begin Page Content -->
+        <nav class="sidebar d-none d-lg-block position-fixed" style="width: 250px;">
+            <div class="sidebar-header mb-4">
+                <i class="fas fa-university me-2"></i>BankAuto Admin
+            </div>
+            <ul class="nav flex-column px-2">
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="../admin/dashboard.jsp"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="pendingAccounts.jsp"><i class="fas fa-user-clock me-2"></i>Pending Accounts</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link active" href="approveAccount.jsp"><i class="fas fa-user-check me-2"></i>Approve Accounts</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="viewLogs.jsp"><i class="fas fa-list me-2"></i>View Logs</a>
+                </li>
+                <li class="nav-item mt-4">
+                    <a class="nav-link" href="javascript:void(0)" onclick="performLogout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                </li>
+            </ul>
+        </nav>
+        <!-- Main Content -->
+        <div class="main-content flex-grow-1">
+            <!-- Header -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm rounded mb-4">
                 <div class="container-fluid">
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Account Approval</h1>
+                    <span class="navbar-brand mb-0 h1"><i class="fas fa-user-shield me-2"></i>Account Approval</span>
+                    <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="d-none d-lg-block">
+                        <span class="me-3 text-muted">Admin</span>
+                        <button class="btn btn-outline-danger btn-sm" onclick="performLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
                     </div>
-                    
-                    <!-- Search Section -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Search Account</h6>
-                        </div>
-                        <div class="card-body">
-                            <form>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="searchType">Search By:</label>
-                                            <select class="form-control" id="searchType">
-                                                <option value="accountId">Account ID</option>
-                                                <option value="email">Email</option>
-                                                <option value="phone">Phone Number</option>
-                                                <option value="name">Full Name</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="searchValue">Search Value:</label>
-                                            <input type="text" class="form-control" id="searchValue" placeholder="Enter search value...">
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-primary" onclick="searchAccount()">
-                                    <i class="fas fa-search"></i> Search
-                                </button>
-                            </form>
-                        </div>
+                </div>
+            </nav>
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Account Approval</h1>
+                </div>
+                
+                <!-- Search Section -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Search Account</h6>
                     </div>
-                    
-                    <!-- Account Details Section -->
-                    <div class="card shadow mb-4" id="accountDetailsCard" style="display: none;">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Account Details</h6>
-                        </div>
-                        <div class="card-body">
+                    <div class="card-body">
+                        <form>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h5>Personal Information</h5>
-                                    <table class="table table-borderless">
-                                        <tr>
-                                            <td><strong>Account ID:</strong></td>
-                                            <td id="accountId">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Full Name:</strong></td>
-                                            <td id="fullName">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Email:</strong></td>
-                                            <td id="email">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Phone:</strong></td>
-                                            <td id="phone">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Date of Birth:</strong></td>
-                                            <td id="dob">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Address:</strong></td>
-                                            <td id="address">-</td>
-                                        </tr>
-                                    </table>
+                                    <div class="form-group">
+                                        <label for="searchType">Search By:</label>
+                                        <select class="form-control" id="searchType">
+                                            <option value="accountId">Account ID</option>
+                                            <option value="email">Email</option>
+                                            <option value="phone">Phone Number</option>
+                                            <option value="name">Full Name</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <h5>Account Information</h5>
-                                    <table class="table table-borderless">
-                                        <tr>
-                                            <td><strong>Account Type:</strong></td>
-                                            <td id="accountType">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Registration Date:</strong></td>
-                                            <td id="registrationDate">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Current Status:</strong></td>
-                                            <td id="currentStatus">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Initial Deposit:</strong></td>
-                                            <td id="initialDeposit">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Identity Verification:</strong></td>
-                                            <td id="identityVerification">-</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <hr>
-                            
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h5>Actions</h5>
-                                    <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-success" onclick="approveAccount()">
-                                            <i class="fas fa-check"></i> Approve Account
-                                        </button>
-                                        <button type="button" class="btn btn-danger" onclick="rejectAccount()">
-                                            <i class="fas fa-times"></i> Reject Account
-                                        </button>
-                                        <button type="button" class="btn btn-warning" onclick="requestMoreInfo()">
-                                            <i class="fas fa-info-circle"></i> Request More Info
-                                        </button>
+                                    <div class="form-group">
+                                        <label for="searchValue">Search Value:</label>
+                                        <input type="text" class="form-control" id="searchValue" placeholder="Enter search value...">
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Comments Section -->
-                    <div class="card shadow mb-4" id="commentsCard" style="display: none;">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Add Comments</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label for="adminComments">Admin Comments:</label>
-                                <textarea class="form-control" id="adminComments" rows="4" placeholder="Enter your comments about this account..."></textarea>
-                            </div>
-                            <button type="button" class="btn btn-primary" onclick="saveComments()">
-                                <i class="fas fa-save"></i> Save Comments
+                            <button type="button" class="btn btn-primary" onclick="searchAccount()">
+                                <i class="fas fa-search"></i> Search
                             </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Account Details Section -->
+                <div class="card shadow mb-4" id="accountDetailsCard" style="display: none;">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Account Details</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Personal Information</h5>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Account ID:</strong></td>
+                                        <td id="accountId">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Full Name:</strong></td>
+                                        <td id="fullName">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Email:</strong></td>
+                                        <td id="email">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Phone:</strong></td>
+                                        <td id="phone">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Date of Birth:</strong></td>
+                                        <td id="dob">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Address:</strong></td>
+                                        <td id="address">-</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Account Information</h5>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Account Type:</strong></td>
+                                        <td id="accountType">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Registration Date:</strong></td>
+                                        <td id="registrationDate">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Current Status:</strong></td>
+                                        <td id="currentStatus">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Initial Deposit:</strong></td>
+                                        <td id="initialDeposit">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Identity Verification:</strong></td>
+                                        <td id="identityVerification">-</td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
+                        
+                        <hr>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5>Actions</h5>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-success" onclick="approveAccount()">
+                                        <i class="fas fa-check"></i> Approve Account
+                                    </button>
+                                    <button type="button" class="btn btn-danger" onclick="rejectAccount()">
+                                        <i class="fas fa-times"></i> Reject Account
+                                    </button>
+                                    <button type="button" class="btn btn-warning" onclick="requestMoreInfo()">
+                                        <i class="fas fa-info-circle"></i> Request More Info
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Comments Section -->
+                <div class="card shadow mb-4" id="commentsCard" style="display: none;">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Add Comments</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="adminComments">Admin Comments:</label>
+                            <textarea class="form-control" id="adminComments" rows="4" placeholder="Enter your comments about this account..."></textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="saveComments()">
+                            <i class="fas fa-save"></i> Save Comments
+                        </button>
                     </div>
                 </div>
             </div>

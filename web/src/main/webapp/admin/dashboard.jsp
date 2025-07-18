@@ -73,61 +73,46 @@
     </style>
 </head>
 <body id="page-top">
-    <div id="wrapper">
+    <div class="d-flex">
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard.jsp">
-                <div class="sidebar-brand-icon">
-                    <i class="fas fa-university"></i>
-                </div>
-                <div class="sidebar-brand-text mx-3">BankAuto Admin</div>
-            </a>
-            
-            <hr class="sidebar-divider my-0">
-            
-            <li class="nav-item active">
-                <a class="nav-link" href="dashboard.jsp">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            
-            <hr class="sidebar-divider">
-            
-            <li class="nav-item">
-                <a class="nav-link" href="javascript:void(0)" onclick="performLogout()">
-                    <i class="fas fa-fw fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </li>
-        </ul>
-        
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-            <div id="content">
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
+        <nav class="sidebar d-none d-lg-block position-fixed" style="width: 250px;">
+            <div class="sidebar-header mb-4">
+                <i class="fas fa-university me-2"></i>BankAuto Admin
+            </div>
+            <ul class="nav flex-column px-2">
+                <li class="nav-item mb-2">
+                    <a class="nav-link active" href="dashboard.jsp"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="pendingAccounts.jsp"><i class="fas fa-user-clock me-2"></i>Pending Accounts</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="approveAccount.jsp"><i class="fas fa-user-check me-2"></i>Approve Accounts</a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="viewLogs.jsp"><i class="fas fa-list me-2"></i>View Logs</a>
+                </li>
+                <li class="nav-item mt-4">
+                    <a class="nav-link" href="javascript:void(0)" onclick="performLogout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                </li>
+            </ul>
+        </nav>
+        <!-- Main Content -->
+        <div class="main-content flex-grow-1">
+            <!-- Header -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm rounded mb-4">
+                <div class="container-fluid">
+                    <span class="navbar-brand mb-0 h1"><i class="fas fa-user-shield me-2"></i>Admin Dashboard</span>
+                    <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+                        <i class="fas fa-bars"></i>
                     </button>
-                    
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Admin</span>
-                                <i class="fas fa-user-circle fa-fw"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
-                                <a class="dropdown-item" href="javascript:void(0)" onclick="performLogout()">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
-                </nav>
-                
-                <!-- Begin Page Content -->
+                    <div class="d-none d-lg-block">
+                        <span class="me-3 text-muted">Admin</span>
+                        <button class="btn btn-outline-danger btn-sm" onclick="performLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </div>
+                </div>
+            </nav>
+            <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>

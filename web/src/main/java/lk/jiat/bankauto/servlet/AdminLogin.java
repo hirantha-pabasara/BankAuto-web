@@ -16,6 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Logger;
+import jakarta.ejb.EJB;
+import lk.jiat.bankauto.core.model.User;
+import lk.jiat.bankauto.core.service.AdminAuthService;
 
 @WebServlet("/admin/login")
 public class AdminLogin extends HttpServlet {
@@ -25,6 +28,9 @@ public class AdminLogin extends HttpServlet {
 
     @Inject
     private SecurityContext securityContext;
+
+    @EJB
+    private AdminAuthService adminAuthService;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -53,6 +59,10 @@ public class AdminLogin extends HttpServlet {
             logger.info("Admin Authentication Status: " + status);
 
             if (status == AuthenticationStatus.SUCCESS) {
+                // Fetch the User object for the admin
+                User adminUser = adminAuthService.findUserByUsernameOrEmail(email);
+                request.getSession().setAttribute("admin", adminUser);
+
                 response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("success", true);
                 jsonResponse.addProperty("message", "Login successful!");
